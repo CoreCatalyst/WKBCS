@@ -1,0 +1,50 @@
+{
+  "nav": {
+    "marketplace": "Marketplace",
+    "categories": "Categories",
+    "ai_assistant": "AI Listing Assistant",
+    "dashboard": "Vendor Dashboard",
+    "rank_tracker": "Network Ranks",
+    "admin_fees": "Platform Financials",
+    "login": "Login / Register",
+    "logout": "Logout",
+    "escrow_guarantee": "100% Escrow Protected"
+  },
+  "hero": {
+    "badge": "Sovereign B2B Commerce Infrastructure",
+    "tagline": "CONNECT. GROW. THRIVE.",
+    "title": "Institutional B2B Wholesale Marketplace with Escrow Protection",
+    "subtitle": "Direct procurement from verified manufacturers with guaranteed delivery, statutory GST compliance, and zero counterparty payment risk.",
+    "search_placeholder": "Search industrial machinery, raw materials, or HSN code...",
+    "btn_search": "Find Verified Products",
+    "btn_onboard": "Register as Verified Vendor"
+  },
+  "stats": {
+    "gmv": "₹248 Cr+",
+    "gmv_label": "Trade Volume Escrowed",
+    "suppliers": "5,400+",
+    "suppliers_label": "GST-Verified Suppliers",
+    "dispute_rate": "0.02%",
+    "dispute_rate_label": "Dispute Ratio (Top in Class)",
+    "settlement_time": "< 24 Hrs",
+    "settlement_time_label": "Average Escrow Settlement"
+  },
+  "products": {
+    "title": "Featured Verified Industrial Catalogs",
+    "subtitle": "Direct factory wholesale pricing with volume discounts and milestone escrow",
+    "moq": "MOQ",
+    "view_product": "View Specifications",
+    "escrow_secured": "Escrow Secured",
+    "gst_invoice": "GST Invoice Included"
+  },
+  "auth": {
+    "login_title": "Sign In to Noryvanta",
+    "login_subtitle": "Access your B2B vendor portal or buyer procurement account",
+    "phone_email_label": "Corporate Phone Number or Email",
+    "send_otp": "Send One-Time Password",
+    "enter_otp": "Enter 6-Digit Verification Code",
+    "verify_proceed": "Verify & Continue",
+    "sso_google": "Continue with Google Enterprise",
+    "sso_microsoft": "Sign in with Microsoft 365"
+  }
+}
