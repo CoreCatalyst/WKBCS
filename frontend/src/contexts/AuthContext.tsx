@@ -8,6 +8,8 @@ interface UserProfile {
   phone?: string;
   email?: string;
   full_name?: string;
+  business_name?: string;
+  profile_picture?: string;
   role: "BUYER" | "VENDOR" | "ADMIN";
   is_verified: boolean;
   has_business_profile?: boolean;

@@ -38,3 +38,8 @@ async def get_db() -> AsyncGenerator[AsyncSession, None]:
 async def init_db():
     async with engine.begin() as conn:
         await conn.run_sync(Base.metadata.create_all)
+        try:
+            from sqlalchemy import text
+            await conn.execute(text("ALTER TABLE products ADD COLUMN videos JSON DEFAULT '[]'"))
+        except Exception:
+            pass  # Column already exists

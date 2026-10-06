@@ -9,9 +9,9 @@ from app.core.database import get_db
 from app.api.deps import get_current_user
 from app.models.user import User, RoleEnum
 from app.models.business import BusinessProfile
-from app.models.product import Product, TieredPrice
+from app.models.product import Product, TieredPrice, ListingType, ListingStatus
 from app.schemas.product import (
-    ProductCreate, ProductOut, AIListingRequest, AIListingResponse, TieredPriceSchema
+    ProductCreate, ProductUpdate, ProductOut, AIListingRequest, AIListingResponse, TieredPriceSchema
 )
 from app.services.ai_service import AIService
 
@@ -72,8 +72,13 @@ async def create_product(
 
     slug = re.sub(r'[^a-zA-Z0-9]+', '-', payload.title.lower()).strip('-') + f"-{uuid.uuid4().hex[:6]}"
 
+    listing_type = ListingType.SERVICE if getattr(payload, "type", "PRODUCT") == "SERVICE" else ListingType.PRODUCT
+    initial_status = ListingStatus.DRAFT if payload.is_draft else ListingStatus.SUBMITTED
+    is_active_initial = (initial_status == ListingStatus.ACTIVE)
+
     product = Product(
         business_id=biz.id,
+        type=listing_type,
         title=payload.title,
         slug=slug,
         description=payload.description,
@@ -81,9 +86,13 @@ async def create_product(
         hsn_code=payload.hsn_code,
         gst_rate=payload.gst_rate or 18.0,
         base_price=payload.base_price,
+        unit=payload.unit or ("piece" if listing_type == ListingType.PRODUCT else "service"),
         moq=payload.moq,
         stock_quantity=payload.stock_quantity,
+        status=initial_status,
+        is_active=is_active_initial,
         images=payload.images or ["https://images.unsplash.com/photo-1581092160607-ee22621dd758?auto=format&fit=crop&w=800&q=80"],
+        videos=payload.videos or [],
         specifications=payload.specifications or {}
     )
     db.add(product)
@@ -107,6 +116,43 @@ async def create_product(
     stmt_reload = select(Product).options(selectinload(Product.tiered_prices)).where(Product.id == product.id)
     res_reload = await db.execute(stmt_reload)
     return res_reload.scalars().first()
+
+@router.put("/{product_id}", response_model=ProductOut, summary="Update an existing product or service listing")
+async def update_product(
+    product_id: str,
+    payload: ProductUpdate,
+    current_user: User = Depends(get_current_user),
+    db: AsyncSession = Depends(get_db)
+):
+    # Verify business ownership
+    stmt = select(BusinessProfile).where(BusinessProfile.user_id == current_user.id)
+    res = await db.execute(stmt)
+    biz = res.scalars().first()
+    if not biz:
+        raise HTTPException(
+            status_code=status.HTTP_403_FORBIDDEN,
+            detail="Business profile required to edit listings."
+        )
+
+    stmt_p = select(Product).options(selectinload(Product.tiered_prices)).where(Product.id == product_id)
+    res_p = await db.execute(stmt_p)
+    product = res_p.scalars().first()
+    if not product:
+        raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="Product not found")
+
+    if product.business_id != biz.id and current_user.role != RoleEnum.SUPER_ADMIN:
+        raise HTTPException(status_code=status.HTTP_403_FORBIDDEN, detail="Not authorized to edit this listing")
+
+    update_data = payload.model_dump(exclude_unset=True)
+    if "tiered_prices" in update_data:
+        update_data.pop("tiered_prices")
+
+    for field, val in update_data.items():
+        setattr(product, field, val)
+
+    await db.commit()
+    await db.refresh(product)
+    return product
 
 @router.post("/ai-assist", response_model=AIListingResponse, summary="AI Product Listing Assistant")
 async def ai_listing_assist(payload: AIListingRequest):

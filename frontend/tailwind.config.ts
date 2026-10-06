@@ -10,52 +10,82 @@ const config: Config = {
   theme: {
     extend: {
       colors: {
+        brand: {
+          50: "#ecfeff",
+          100: "#cffafe",
+          200: "#a5f3fc",
+          300: "#67e8f9",
+          400: "#22d3ee",
+          500: "#06b6d4",
+          600: "#0891b2",
+          700: "#0e7490",
+          800: "#155e75",
+          900: "#164e63",
+          navy: "#0a1128",
+          darkNavy: "#050b1a",
+          deepTeal: "#006466",
+        },
+        noryvanta: {
+          primary: "#113D60",
+          deepBlue: "#0A4664",
+          teal: "#12768A",
+          brightTeal: "#1E96AA",
+          cyan: "#3CB4D2",
+        },
         primary: {
-          DEFAULT: "#0F172A", // Obsidian Navy
-          container: "#131B2E",
+          DEFAULT: "#113D60", // Noryvanta Global Primary Blue
+          container: "#0A4664",
           fixed: "#DAE2FD",
         },
         secondary: {
-          DEFAULT: "#1E3A8A", // Deep Royal
-          container: "#8FA7FE",
-          cobalt: "#1D4ED8",  // Bright Cobalt
+          DEFAULT: "#0284c7", // Vibrant Cyan
+          container: "#bae6fd",
+          cobalt: "#0369a1",
         },
         tertiary: {
-          DEFAULT: "#10B981", // Verification Emerald
+          DEFAULT: "#10b981", // Verification Emerald
           dark: "#059669",
           container: "#002113",
         },
         accent: {
-          amber: "#F59E0B",   // Escrow Warning
-          amberDark: "#D97706",
+          teal: "#06b6d4",
+          cyan: "#38bdf8",
+          amber: "#f59e0b",
+          amberDark: "#d97706",
         },
         surface: {
-          DEFAULT: "#F8FAFC", // Base Canvas
-          card: "#FFFFFF",    // Pure White Card
-          subtle: "#EFF4FF",
-          variant: "#D3E4FE",
+          DEFAULT: "#f8fafc",
+          card: "#ffffff",
+          subtle: "#f0f9ff",
+          variant: "#e0f2fe",
+          dark: "#070d1e",
         },
         border: {
-          DEFAULT: "#E2E8F0",
-          medium: "#CBD5E1",
-          dark: "#76777D",
+          DEFAULT: "#e2e8f0",
+          medium: "#cbd5e1",
+          dark: "#64748b",
+          cyan: "#bae6fd",
         },
       },
       fontFamily: {
-        headline: ["'Plus Jakarta Sans'", "sans-serif"],
-        body: ["Inter", "sans-serif"],
+        sans: ["Inter", "ui-sans-serif", "system-ui", "-apple-system", "BlinkMacSystemFont", "'Segoe UI'", "Roboto", "Helvetica", "Arial", "sans-serif"],
+        headline: ["Inter", "ui-sans-serif", "system-ui", "-apple-system", "BlinkMacSystemFont", "'Segoe UI'", "sans-serif"],
+        body: ["Inter", "ui-sans-serif", "system-ui", "-apple-system", "BlinkMacSystemFont", "'Segoe UI'", "sans-serif"],
       },
       borderRadius: {
-        DEFAULT: "0.5rem", // 8px
-        lg: "1rem",        // 16px
-        xl: "1.5rem",
+        DEFAULT: "0.5rem",
+        lg: "0.875rem",
+        xl: "1.25rem",
+        "2xl": "1.75rem",
         full: "9999px",
       },
       boxShadow: {
-        ambient: "0 1px 3px 0 rgba(15, 23, 42, 0.04), 0 1px 2px -1px rgba(15, 23, 42, 0.03)",
-        lifted: "0 4px 6px -1px rgba(15, 23, 42, 0.06), 0 2px 4px -2px rgba(15, 23, 42, 0.04)",
-        elevated: "0 20px 25px -5px rgba(15, 23, 42, 0.08), 0 8px 10px -6px rgba(15, 23, 42, 0.03)",
-      }
+        ambient: "0 1px 3px 0 rgba(17, 61, 96, 0.04), 0 1px 2px -1px rgba(17, 61, 96, 0.03)",
+        lifted: "0 4px 6px -1px rgba(17, 61, 96, 0.06), 0 2px 4px -2px rgba(17, 61, 96, 0.04)",
+        elevated: "0 20px 25px -5px rgba(17, 61, 96, 0.08), 0 8px 10px -6px rgba(17, 61, 96, 0.03)",
+        glow: "0 0 25px -5px rgba(30, 150, 170, 0.3)",
+        glowTeal: "0 0 30px -5px rgba(18, 118, 138, 0.35)",
+      },
     },
   },
   plugins: [],

@@ -74,9 +74,6 @@ export default function OrderDetailPage() {
   const subtotal = order.unit_price * order.quantity;
   const statutoryGst = subtotal * (order.gst_rate / 100);
   const grossPayable = subtotal + statutoryGst;
-  const platformFee = subtotal * 0.03;
-  const tds194O = subtotal * 0.01;
-  const netVendorSettlement = subtotal - platformFee - tds194O;
 
   return (
     <div className="min-h-screen bg-[#F8FAFC] pb-24">
@@ -104,10 +101,10 @@ export default function OrderDetailPage() {
                 <span className="text-xs text-slate-500 font-mono">Escrow ID: {order.escrow_id}</span>
               </div>
               <h1 className="text-2xl font-bold font-headline text-[#0F172A]">
-                Transaction & Escrow Settlement Detail
+                Customer Order &amp; Invoice Summary
               </h1>
               <p className="text-sm text-slate-600 mt-0.5">
-                Legally binding B2B milestone contract governed under Axis Trustee Escrow terms.
+                Legally binding marketplace purchase contract secured under Axis Trustee Escrow terms.
               </p>
             </div>
 
@@ -133,27 +130,27 @@ export default function OrderDetailPage() {
       </div>
 
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 mt-8 space-y-8">
-        {/* Disbursal & Bank Destination Grid */}
+        {/* Payment Confirmation & Escrow Protection Grid */}
         <div className="grid grid-cols-1 lg:grid-cols-12 gap-6">
-          {/* Main 8 cols: Net Disbursal Card */}
+          {/* Main 8 cols: Customer Paid & Escrow Protection Card */}
           <div className="lg:col-span-8 bg-[#0F172A] text-white rounded-xl p-6 shadow-md flex flex-col justify-between">
             <div>
               <div className="flex items-center justify-between mb-4">
                 <span className="text-xs uppercase tracking-wider text-blue-200 font-bold">
-                  Final Disbursed Liquidity
+                  Amount Paid by Customer
                 </span>
                 <span className="px-2.5 py-0.5 rounded-full bg-emerald-950 text-emerald-400 border border-emerald-800 text-[11px] font-bold flex items-center gap-1">
                   <Lock className="w-3 h-3" />
-                  Bank Batch Reconciled
+                  Sovereign Escrow Secured
                 </span>
               </div>
 
-              <span className="text-xs text-slate-400 block mb-1">Net Business Settlement</span>
+              <span className="text-xs text-slate-400 block mb-1">Total Paid (Inclusive of Taxes)</span>
               <div className="text-3xl font-bold font-headline text-white tracking-tight">
-                ₹{netVendorSettlement.toLocaleString("en-IN", { minimumFractionDigits: 2 })}
+                ₹{grossPayable.toLocaleString("en-IN", { minimumFractionDigits: 2 })}
               </div>
               <p className="text-xs text-slate-400 mt-1">
-                Directly creditable to merchant linked corporate account upon delivery confirmation.
+                Your payment is safely held in an RBI-regulated nodal trust escrow and released to the supplier only upon delivery approval.
               </p>
             </div>
 
@@ -161,18 +158,18 @@ export default function OrderDetailPage() {
               <div className="p-3 rounded-lg bg-slate-900 border border-slate-800 flex items-start gap-3">
                 <Landmark className="w-5 h-5 text-blue-400 mt-0.5 shrink-0" />
                 <div>
-                  <span className="text-[10px] uppercase text-slate-400 font-bold block">Payout Destination</span>
-                  <p className="text-xs font-bold text-white">HDFC Bank Current A/c</p>
-                  <p className="text-[11px] text-slate-400 font-mono">A/c: {order.bank_account} • IFSC: {order.bank_ifsc}</p>
+                  <span className="text-[10px] uppercase text-slate-400 font-bold block">Payment Method</span>
+                  <p className="text-xs font-bold text-white">Net Banking / Direct Clearing</p>
+                  <p className="text-[11px] text-slate-400 font-mono">Status: Verified &amp; Held in Escrow</p>
                 </div>
               </div>
 
               <div className="p-3 rounded-lg bg-slate-900 border border-slate-800 flex items-start gap-3">
                 <ShieldCheck className="w-5 h-5 text-emerald-400 mt-0.5 shrink-0" />
                 <div>
-                  <span className="text-[10px] uppercase text-slate-400 font-bold block">Settlement Reference UTR</span>
+                  <span className="text-[10px] uppercase text-slate-400 font-bold block">Payment Reference UTR</span>
                   <p className="text-xs font-mono font-bold text-white">{order.utr_reference}</p>
-                  <p className="text-[11px] text-slate-400">Auth Clearing Code: NRYV-IN-TXN-BLR-09</p>
+                  <p className="text-[11px] text-slate-400">Clearing Code: NRYV-IN-TXN-BLR-09</p>
                 </div>
               </div>
             </div>
@@ -258,33 +255,33 @@ export default function OrderDetailPage() {
             </table>
           </div>
 
-          {/* Deductions breakdown */}
+          {/* Customer Invoice & Payment Summary */}
           <div className="mt-6 pt-4 border-t border-slate-100 flex flex-col sm:flex-row sm:items-center justify-between gap-4">
-            <div className="text-xs text-slate-500 space-y-1">
-              <p>• Platform Fee: 3.0% on base order value (₹{platformFee.toLocaleString("en-IN")})</p>
-              <p>• TDS Section 194-O: 1.0% statutory deduction deposited with IT Dept (₹{tds194O.toLocaleString("en-IN")})</p>
+            <div className="text-xs text-slate-500 space-y-1.5">
+              <p className="flex items-center gap-1.5 text-emerald-700 font-semibold">
+                <CheckCircle2 className="w-4 h-4" />
+                <span>Payment Confirmed & Secured in Sovereign Escrow</span>
+              </p>
+              <p>• Goods & Services Tax (GST) compliant invoice issued by supplier.</p>
+              <p>• Funds released to merchant only after verified physical delivery & inspection window.</p>
             </div>
 
-            <div className="bg-slate-50 p-4 rounded-lg border border-slate-200 text-xs sm:w-80 space-y-2">
+            <div className="bg-slate-50 p-5 rounded-2xl border border-slate-200 text-xs sm:w-84 space-y-2.5">
               <div className="flex justify-between text-slate-600">
-                <span>Contract Base Total:</span>
-                <span className="font-mono text-slate-900">₹{subtotal.toLocaleString("en-IN")}</span>
+                <span>Items Subtotal:</span>
+                <span className="font-mono text-slate-900 font-semibold">₹{subtotal.toLocaleString("en-IN")}</span>
               </div>
               <div className="flex justify-between text-slate-600">
-                <span>GST (18%):</span>
-                <span className="font-mono text-slate-900">+ ₹{statutoryGst.toLocaleString("en-IN")}</span>
+                <span>Statutory GST ({order.gst_rate}%):</span>
+                <span className="font-mono text-slate-900 font-semibold">+ ₹{statutoryGst.toLocaleString("en-IN")}</span>
               </div>
               <div className="flex justify-between text-slate-600">
-                <span>Platform Commission (3%):</span>
-                <span className="font-mono text-red-600">- ₹{platformFee.toLocaleString("en-IN")}</span>
+                <span>Shipping & Handling:</span>
+                <span className="font-mono text-emerald-700 font-semibold">Free</span>
               </div>
-              <div className="flex justify-between text-slate-600">
-                <span>TDS u/s 194-O (1%):</span>
-                <span className="font-mono text-red-600">- ₹{tds194O.toLocaleString("en-IN")}</span>
-              </div>
-              <div className="pt-2 border-t border-slate-200 flex justify-between font-bold text-sm text-[#0F172A]">
-                <span>Net Vendor Liquidity:</span>
-                <span className="font-mono text-emerald-700">₹{netVendorSettlement.toLocaleString("en-IN")}</span>
+              <div className="pt-2.5 border-t border-slate-200 flex justify-between font-semibold text-sm text-[#0F172A]">
+                <span>Total Amount Paid:</span>
+                <span className="font-mono text-emerald-700 text-base font-semibold">₹{grossPayable.toLocaleString("en-IN")}</span>
               </div>
             </div>
           </div>

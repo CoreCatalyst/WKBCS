@@ -12,8 +12,8 @@ The Noryvanta Escrow Policy guarantees transactional safety for both buyers and 
 2. **Milestone 2: Dispatch & In-Transit Tracking**: Supplier attaches valid e-way bill number and logistics tracking identifier. Status updates to `DISPATCHED`.
 3. **Milestone 3: Delivery Confirmation & 48-Hour Inspection Window**: Logistics API signals delivery. The 48-hour inspection countdown initiates.
 4. **Milestone 4: Fund Release**: If no dispute is filed within 48 hours, or if buyer confirms electronic acceptance, funds are disbursed automatically:
-   - Vendor receives: $\text{Gross Amount} - \text{Platform Fee} - \text{TDS (Sec 194-O)}$.
-   - Platform fee is transferred to Noryvanta's operational account.
+   - Vendor receives: $\text{Gross Amount} - \text{Applicable Category Platform Fee} - \text{TDS (Sec 194-O)}$.
+   - Category platform fee (Wholesaler: 3.20%, Distributor: 5.20%, Services: 5.20%, Retailer: 8.20%) is transferred to Noryvanta's operational revenue ledger.
    - TDS is credited into the central tax escrow ledger.
 
 ---

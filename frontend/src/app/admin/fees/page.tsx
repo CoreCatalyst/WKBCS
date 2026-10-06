@@ -132,39 +132,53 @@ export default function AdminFeesPage() {
   return (
     <div className="min-h-screen bg-[#F8FAFC] pb-24">
       {/* Top Banner */}
-      <div className="bg-white border-b border-[#E2E8F0]">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-6">
+      <div className="bg-white border-b border-slate-200/80 shadow-2xs">
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-5 sm:py-6">
           <div className="flex flex-col md:flex-row md:items-center justify-between gap-4">
             <div>
               <div className="flex items-center gap-2 mb-1.5">
                 <span className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-emerald-50 border border-emerald-200 text-emerald-900 text-xs font-semibold">
                   <ShieldCheck className="w-3.5 h-3.5 text-emerald-600" />
-                  Nodal Settlement & Fee Audit Hub
+                  Nodal Settlement &amp; Fee Audit Hub
                 </span>
                 <span className="text-xs text-slate-500 font-mono">Axis Trustee Nodal Escrow</span>
               </div>
               <h1 className="text-2xl font-bold font-headline text-[#0F172A]">
-                Admin Financial & Platform Fee Dashboard
+                Admin Financial &amp; Platform Fee Dashboard
               </h1>
               <p className="text-sm text-slate-600 mt-0.5">
                 Real-time fee ledger audit, Section 194-O statutory withholding, and nodal settlement reconciliations.
               </p>
             </div>
 
-            <div className="flex items-center gap-3">
-              <Link
-                href="/admin/routing"
-                className="px-4 py-2 rounded-lg bg-slate-100 hover:bg-slate-200 text-slate-700 text-xs font-semibold flex items-center gap-1.5 transition"
-              >
-                <span>Gateway Routing</span>
-                <ChevronRight className="w-3.5 h-3.5" />
-              </Link>
+            <div className="flex flex-wrap items-center gap-2.5">
+              {/* Quick Portal Switcher */}
+              <div className="flex items-center gap-1.5 p-1 bg-slate-100 rounded-xl border border-slate-200/80">
+                <Link
+                  href="/admin"
+                  className="px-3 py-1.5 text-center text-xs font-bold rounded-lg text-slate-600 hover:text-[#113D60] hover:bg-white border border-transparent hover:border-slate-200/80 transition"
+                >
+                  Admin Desk
+                </Link>
+                <Link
+                  href="/admin/fees"
+                  className="px-3 py-1.5 text-center text-xs font-bold rounded-lg bg-[#113D60] text-white border border-cyan-500/60 shadow-xs"
+                >
+                  Fee Ledger
+                </Link>
+                <Link
+                  href="/admin/routing"
+                  className="px-3 py-1.5 text-center text-xs font-bold rounded-lg text-slate-600 hover:text-[#113D60] hover:bg-white border border-transparent hover:border-slate-200/80 transition"
+                >
+                  Routing Engine
+                </Link>
+              </div>
 
               <button
                 onClick={() => alert("Audit Pack (Form 26AS + GST E-Invoice Reconciliation) downloaded.")}
-                className="px-4 py-2 rounded-lg bg-[#0F172A] hover:bg-[#1E3A8A] text-white text-xs font-semibold transition flex items-center gap-1.5 shadow-sm"
+                className="px-4 py-2 rounded-xl bg-[#113D60] hover:bg-slate-800 text-white text-xs font-bold transition flex items-center gap-1.5 border border-cyan-500/40 hover:border-cyan-400 shadow-2xs cursor-pointer"
               >
-                <Download className="w-3.5 h-3.5" />
+                <Download className="w-3.5 h-3.5 text-cyan-400" />
                 <span>Export Audit Pack</span>
               </button>
             </div>
@@ -172,11 +186,11 @@ export default function AdminFeesPage() {
         </div>
       </div>
 
-      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 mt-8 space-y-8">
-        {/* 6 Bento KPI Cards */}
-        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-6 gap-4">
+      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 mt-6 sm:mt-8 space-y-6 sm:space-y-8">
+        {/* 6 Bento KPI Cards with Minimal Thin Slick Borders */}
+        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-6 gap-3 sm:gap-4">
           {/* KPI 1: Gross Volume */}
-          <div className="bg-white p-5 rounded-xl border border-[#E2E8F0] shadow-sm flex flex-col justify-between">
+          <div className="bg-white p-5 rounded-2xl border border-slate-200/80 hover:border-cyan-500/40 shadow-ambient flex flex-col justify-between transition-all duration-200">
             <span className="text-[11px] uppercase tracking-wider text-slate-400 font-bold">Gross Escrow GMV</span>
             <div className="text-xl font-bold font-headline text-[#0F172A] mt-2">
               ₹{(summary?.total_gmv || 24850000).toLocaleString("en-IN")}
@@ -188,7 +202,7 @@ export default function AdminFeesPage() {
           </div>
 
           {/* KPI 2: Platform Commission */}
-          <div className="bg-white p-5 rounded-xl border border-[#E2E8F0] shadow-sm flex flex-col justify-between">
+          <div className="bg-white p-5 rounded-2xl border border-slate-200/80 hover:border-cyan-500/40 shadow-ambient flex flex-col justify-between transition-all duration-200">
             <span className="text-[11px] uppercase tracking-wider text-slate-400 font-bold">Platform Take-Rate</span>
             <div className="text-xl font-bold font-headline text-[#1E3A8A] mt-2">
               ₹{(summary?.platform_commission_earned || 745500).toLocaleString("en-IN")}
@@ -199,7 +213,7 @@ export default function AdminFeesPage() {
           </div>
 
           {/* KPI 3: TDS Section 194-O */}
-          <div className="bg-white p-5 rounded-xl border border-[#E2E8F0] shadow-sm flex flex-col justify-between">
+          <div className="bg-white p-5 rounded-2xl border border-slate-200/80 hover:border-cyan-500/40 shadow-ambient flex flex-col justify-between transition-all duration-200">
             <span className="text-[11px] uppercase tracking-wider text-slate-400 font-bold">TDS (Sec 194-O)</span>
             <div className="text-xl font-bold font-headline text-slate-800 mt-2">
               ₹{(summary?.tds_collected_section_194o || 248500).toLocaleString("en-IN")}
@@ -210,7 +224,7 @@ export default function AdminFeesPage() {
           </div>
 
           {/* KPI 4: Active Escrow */}
-          <div className="bg-white p-5 rounded-xl border border-[#E2E8F0] shadow-sm flex flex-col justify-between">
+          <div className="bg-white p-5 rounded-2xl border border-slate-200/80 hover:border-cyan-500/40 shadow-ambient flex flex-col justify-between transition-all duration-200">
             <span className="text-[11px] uppercase tracking-wider text-slate-400 font-bold">In-Escrow Locked</span>
             <div className="text-xl font-bold font-headline text-amber-700 mt-2">
               ₹{(summary?.active_funds_in_escrow || 4210000).toLocaleString("en-IN")}
@@ -221,7 +235,7 @@ export default function AdminFeesPage() {
           </div>
 
           {/* KPI 5: Net Disbursed */}
-          <div className="bg-white p-5 rounded-xl border border-[#E2E8F0] shadow-sm flex flex-col justify-between">
+          <div className="bg-white p-5 rounded-2xl border border-slate-200/80 hover:border-cyan-500/40 shadow-ambient flex flex-col justify-between transition-all duration-200">
             <span className="text-[11px] uppercase tracking-wider text-slate-400 font-bold">Net Disbursed</span>
             <div className="text-xl font-bold font-headline text-emerald-700 mt-2">
               ₹1,98,46,000
@@ -232,7 +246,7 @@ export default function AdminFeesPage() {
           </div>
 
           {/* KPI 6: Dispute Ratio */}
-          <div className="bg-white p-5 rounded-xl border border-[#E2E8F0] shadow-sm flex flex-col justify-between">
+          <div className="bg-white p-5 rounded-2xl border border-slate-200/80 hover:border-cyan-500/40 shadow-ambient flex flex-col justify-between transition-all duration-200">
             <span className="text-[11px] uppercase tracking-wider text-slate-400 font-bold">Dispute Holds</span>
             <div className="text-xl font-bold font-headline text-slate-800 mt-2">
               2 Orders
@@ -243,23 +257,23 @@ export default function AdminFeesPage() {
           </div>
         </div>
 
-        {/* Settlement Architecture Waterfall SVG Card */}
-        <div className="bg-white rounded-xl border border-[#E2E8F0] p-6 shadow-sm">
+        {/* Settlement Architecture Waterfall SVG Card with Minimal Thin Slick Border */}
+        <div className="bg-white rounded-3xl border border-slate-200/80 p-5 sm:p-6 shadow-ambient">
           <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-2 mb-4">
             <div>
               <h2 className="text-base font-bold font-headline text-[#0F172A]">
-                Platform Settlement Architecture & Funds Flow
+                Platform Settlement Architecture &amp; Funds Flow
               </h2>
               <p className="text-xs text-slate-500 mt-0.5">
                 Multi-stage funds distribution stream from payment capture to nodal settlement.
               </p>
             </div>
-            <span className="text-xs font-semibold text-emerald-700 bg-emerald-50 px-3 py-1 rounded-full border border-emerald-200">
+            <span className="text-xs font-semibold text-emerald-700 bg-emerald-50 px-3 py-1 rounded-full border border-emerald-200 self-start sm:self-auto">
               T+1 Automated Cycle
             </span>
           </div>
 
-          <div className="w-full bg-slate-50 rounded-xl p-4 border border-slate-200 overflow-x-auto">
+          <div className="w-full bg-slate-50/70 rounded-2xl p-4 border border-slate-200/80 overflow-x-auto">
             <svg className="w-full min-w-[720px] h-36" fill="none" viewBox="0 0 760 140" xmlns="http://www.w3.org/2000/svg">
               {/* Node 1: Gross */}
               <rect className="fill-slate-200/80 stroke-slate-300" height="85" rx="8" width="130" x="10" y="25" />
@@ -310,12 +324,12 @@ export default function AdminFeesPage() {
           </div>
         </div>
 
-        {/* Fee Ledger Audit Table */}
-        <div className="bg-white rounded-xl border border-[#E2E8F0] p-6 shadow-sm">
+        {/* Fee Ledger Audit Card with Minimal Thin Slick Borders */}
+        <div className="bg-white rounded-3xl border border-slate-200/80 p-5 sm:p-6 shadow-ambient">
           <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 mb-6">
             <div>
               <h2 className="text-base font-bold font-headline text-[#0F172A]">
-                Comprehensive Platform Fee & Tax Ledger
+                Comprehensive Platform Fee &amp; Tax Ledger
               </h2>
               <p className="text-xs text-slate-500 mt-0.5">
                 Itemized transaction fees, GST tax credits, and Section 194-O statutory withholdings.
@@ -328,7 +342,7 @@ export default function AdminFeesPage() {
               <select
                 value={filterType}
                 onChange={(e) => setFilterType(e.target.value)}
-                className="px-3 py-1.5 text-xs rounded-lg border border-slate-300 bg-white font-semibold text-slate-700"
+                className="px-3 py-1.5 text-xs rounded-xl border border-slate-200/80 hover:border-cyan-500/40 focus:border-cyan-500 focus:ring-1 focus:ring-cyan-500/20 bg-white font-semibold text-slate-700 outline-none transition"
               >
                 <option value="ALL">All Transactions</option>
                 <option value="PLATFORM_COMMISSION">Platform Commission</option>
@@ -337,10 +351,47 @@ export default function AdminFeesPage() {
             </div>
           </div>
 
-          <div className="overflow-x-auto">
+          {/* Mobile Card List View (< sm screens) */}
+          <div className="sm:hidden space-y-3">
+            {filteredEntries.map((row) => (
+              <div
+                key={row.id}
+                className="p-3.5 bg-slate-50/70 rounded-2xl border border-slate-200/80 space-y-2 shadow-2xs"
+              >
+                <div className="flex items-center justify-between">
+                  <span className="font-mono font-bold text-xs text-[#113D60]">{row.id}</span>
+                  <span className="px-2 py-0.5 rounded-full bg-emerald-50 text-emerald-800 text-[10px] font-semibold border border-emerald-200">
+                    {row.status}
+                  </span>
+                </div>
+                <div className="text-xs">
+                  <p className="font-semibold text-slate-800 truncate">{row.vendor_name}</p>
+                  <p className="text-[11px] text-slate-500 mt-0.5 font-mono">{row.order_id} • {row.date}</p>
+                </div>
+                <div className="flex items-center justify-between text-[11px] pt-1 border-t border-slate-200/60">
+                  <span
+                    className={`px-2 py-0.5 rounded text-[10px] font-semibold ${
+                      row.fee_type === "PLATFORM_COMMISSION"
+                        ? "bg-blue-50 text-[#1E3A8A] border border-blue-200"
+                        : "bg-purple-50 text-purple-800 border border-purple-200"
+                    }`}
+                  >
+                    {row.fee_type === "PLATFORM_COMMISSION" ? "Platform Take (3%)" : "TDS u/s 194-O (1%)"}
+                  </span>
+                  <div>
+                    <span className="text-[10px] text-slate-400 mr-1.5">Value: ₹{row.gross_order_value.toLocaleString("en-IN")}</span>
+                    <strong className="text-slate-900">Fee: ₹{row.fee_amount.toLocaleString("en-IN")}</strong>
+                  </div>
+                </div>
+              </div>
+            ))}
+          </div>
+
+          {/* Desktop Table for sm: screens and up */}
+          <div className="hidden sm:block overflow-x-auto">
             <table className="w-full text-left text-xs">
               <thead>
-                <tr className="bg-slate-50 text-slate-700 font-semibold border-b border-slate-200">
+                <tr className="bg-slate-50/80 text-slate-700 font-semibold border-b border-slate-200/80">
                   <th className="py-3 px-4">Ledger ID</th>
                   <th className="py-3 px-4">Order Ref</th>
                   <th className="py-3 px-4">Vendor Entity</th>
@@ -353,7 +404,7 @@ export default function AdminFeesPage() {
               </thead>
               <tbody className="divide-y divide-slate-100 font-mono">
                 {filteredEntries.map((row) => (
-                  <tr key={row.id} className="hover:bg-slate-50">
+                  <tr key={row.id} className="hover:bg-slate-50/80 transition">
                     <td className="py-3.5 px-4 font-bold text-slate-800">{row.id}</td>
                     <td className="py-3.5 px-4 text-[#1D4ED8]">
                       <Link href="/orders" className="hover:underline">

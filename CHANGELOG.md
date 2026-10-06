@@ -4,6 +4,37 @@ All notable changes to the Noryvanta Business Marketplace Platform.
 Format: `[DATE] | [TYPE] | [SCOPE] | [Description]`
 Types: `SECURITY` | `FIX` | `FEAT` | `REFACTOR` | `DOCS` | `TEST` | `INFRA`
 
+## [2026-10-03] — Live Marketplace Engine & Home Page Architecture Extension
+
+### FEAT | Marketplace REST APIs & Privacy Protection
+- **File:** `backend/app/schemas/marketplace.py`, `backend/app/api/v1/endpoints/marketplace.py`
+- **Endpoints:**
+  - `GET /api/v1/marketplace/products`: Active products with sanitized public merchant profile
+  - `GET /api/v1/marketplace/products/{id}`: Single active product detail
+  - `GET /api/v1/marketplace/services`: Active services with sanitized provider profile
+  - `GET /api/v1/marketplace/services/{id}`: Single active service detail
+  - `GET /api/v1/marketplace/categories`: 12 canonical categories with live active counts
+  - `GET /api/v1/marketplace/featured`: Curated active products & services for home page
+  - `GET /api/v1/marketplace/search`: Multi-parameter search across products and services
+- **Merchant Privacy Invariant:** Strict isolation of private financial credentials (`bank_account_number`, `bank_ifsc`, `pan`, `virtual_escrow_account_id` never exposed to public consumers).
+
+### FEAT | Listing Approval Workflow & Active Visibility Rule
+- **File:** `backend/app/models/product.py`, `backend/app/api/v1/endpoints/admin.py`, `backend/app/api/v1/endpoints/products.py`
+- **Lifecycle:** `DRAFT` → `SUBMITTED` → `UNDER_REVIEW` → `ACTIVE` | `REJECTED` | `SUSPENDED`.
+- **Enforcement:** Non-active listings (Draft, Submitted, Under Review, Rejected, Suspended) are strictly hidden from public customers (`HTTP 404`).
+- **Admin Review:** Added `/api/v1/admin/listings` review, `/approve`, `/reject`, `/suspend` with immutable `AuditLog`. Once approved to `ACTIVE`, listings appear immediately on Marketplace and Home Page without requiring recreation.
+
+### FEAT | Home Page Live Integration & Multi-Tier Hierarchy
+- **File:** `frontend/src/app/page.tsx`, `frontend/src/lib/api.ts`
+- **Implementation:**
+  - Consumes live backend APIs (`/marketplace/featured`, `/marketplace/categories`) with offline fallback.
+  - Hierarchy: Products (Wholesalers, Distributors, Retailers) & Services (Registered Service Providers, Skilled Small-Scale Home Service Providers).
+  - Actions: Interactive "Add to Cart" with notification toast, and "Buy Now" / "Book Service" CTAs.
+
+### TEST | Automated Marketplace Suite
+- **File:** `backend/tests/test_marketplace.py`
+- **Coverage:** Verified active listing visibility, admin approval transition, merchant privacy isolation, and unified search. 71/71 tests passing.
+
 ---
 
 ## [2026-09-24] — Priority 1 Security & Correctness Fixes
@@ -82,17 +113,41 @@ Types: `SECURITY` | `FIX` | `FEAT` | `REFACTOR` | `DOCS` | `TEST` | `INFRA`
 
 ---
 
+## [2026-10-02] — Enterprise Integrations, Business Invariants & Alembic Migrations
+
+### FEAT | Alembic Migration Sequence (Versions 001 to 004)
+- Added sequential migration chain:
+  - Version 001: `001_businesses_table.py`
+  - Version 002: `002_add_gst_number.py`
+  - Version 003: `003_add_verification_status.py`
+  - Version 004: `004_add_business_category.py`
+- Verified schema evolution using `alembic history`.
+
+### FEAT | Business Rule Invariants & Server Validation
+- Server-side validation enforcing minimum 6 images on listings (HTTP 422 on < 6).
+- Zero customer platform fee guarantee maintained: customer pays only subtotal + taxes; 10% fee and 1% TDS are retained business-side during settlement ledger generation.
+- Historical fee rate preservation in `Settlement` records.
+
+### FEAT | External Integration Adapters
+- **NotificationService**: Resend API integration with templates for Business Registered, Listing Approved, Order Received, Settlement Processed.
+- **PushNotificationService**: Firebase FCM provider for New Order, Payment Successful, Listing Approved, Level Status Changed.
+- **MapsService**: Google Maps Geocoding utility mapping structured address components to latitude and longitude.
+- **TurnstileService**: Cloudflare Turnstile CAPTCHA bot protection on OTP and Google login.
+- **Google OAuth Login**: `POST /api/v1/auth/google` exchanging verified Google identity for Noryvanta JWT session tokens.
+- **PaymentService**: Razorpay & Cashfree adapters with HMAC-SHA256 signature verification and idempotency locks.
+- **Prometheus Monitoring**: `GET /metrics` text-format scraping endpoint exporting platform counters and gauges.
+
+### TEST | Complete Passing Test Suite
+- 15 / 15 backend tests passing with pytest (`exit code 0`).
+- 18 / 18 frontend Next.js routes compiled successfully (`exit code 0`).
+
+---
+
 ## Known Issues / Next Priorities
 
-| Priority | Issue |
-|----------|-------|
-| P2 | Git not initialized — `git init` needed |
-| P2 | No Alembic migrations — only `create_all()` |
-| P2 | Minimum 6-image backend enforcement not implemented |
-| P2 | Docker infra files missing: `infra/postgres/init.sql`, Grafana dirs |
-| P3 | No Razorpay/Cashfree payment gateway integration |
-| P3 | No network/120-level rank system backend model |
-| P3 | No KYC document upload |
-| P3 | OTP SMS/email delivery is log-only (no real MSG91/SES) |
-| P3 | OAuth SSO does not verify OIDC token |
-| P4 | Dashboard, rank-tracker, orders/[id] use hardcoded mock data |
+| Priority | Issue / Task | Status |
+|---|---|---|
+| P1 | **Frontend-to-Backend Live API Client**: Implement unified client (`frontend/src/lib/api.ts`) and wire Next.js forms (Register, Login, Checkout, Dashboard) to live backend endpoints | Ready to Start |
+| P2 | **Celery Asynchronous Batch Workers**: Formalize standalone worker script (`celery_worker.py`) for background AI batch image generation | In Progress |
+| P3 | **Production SMS DLT Gateway**: Connect live Indian DLT-compliant SMS provider (e.g. Msg91) for production OTP delivery | Planned |
+

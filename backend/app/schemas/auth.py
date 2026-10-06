@@ -1,9 +1,10 @@
 from typing import Optional
-from pydantic import BaseModel, EmailStr
+from pydantic import BaseModel, EmailStr, ConfigDict
 
 class OTPRequest(BaseModel):
     identifier: str  # Phone number or email
     channel: str = "sms"  # 'sms' or 'email'
+    turnstile_token: Optional[str] = None
 
 class OTPResponse(BaseModel):
     success: bool
@@ -16,6 +17,20 @@ class OTPVerify(BaseModel):
     otp_code: str
     full_name: Optional[str] = None
     role: Optional[str] = "BUYER"
+    turnstile_token: Optional[str] = None
+
+class EmailPasswordLogin(BaseModel):
+    email: str
+    password: str
+    turnstile_token: Optional[str] = None
+
+class UserRegisterRequest(BaseModel):
+    email: Optional[str] = None
+    phone: Optional[str] = None
+    password: Optional[str] = None
+    full_name: str
+    role: str = "CUSTOMER"  # CUSTOMER, BUSINESS_OWNER
+    turnstile_token: Optional[str] = None
 
 class TokenResponse(BaseModel):
     access_token: str
@@ -23,10 +38,13 @@ class TokenResponse(BaseModel):
     token_type: str = "bearer"
     expires_in: int
     user_id: str
+    uaid: Optional[str] = None
     role: str
     phone: Optional[str] = None
     email: Optional[str] = None
     has_business_profile: bool = False
+
+    model_config = ConfigDict(from_attributes=True)
 
 class RefreshTokenRequest(BaseModel):
     refresh_token: str
@@ -35,3 +53,11 @@ class OAuthLoginRequest(BaseModel):
     provider: str
     id_token: str
     role: Optional[str] = "BUYER"
+    turnstile_token: Optional[str] = None
+
+class GoogleOAuthRequest(BaseModel):
+    id_token: str
+    email: Optional[str] = None
+    full_name: Optional[str] = None
+    role: Optional[str] = "BUYER"
+    turnstile_token: Optional[str] = None

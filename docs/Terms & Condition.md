@@ -31,8 +31,13 @@ Noryvanta operates strictly as an **Intermediary and B2B Technology Service Prov
    - Proof of delivery confirmed by integrated logistics tracking or buyer electronic acknowledgment.
    - Expiration of the mandatory 48-hour inspection window without a logged dispute.
 4. **Platform Fees & Tax Deductions**: Prior to vendor disbursement, Noryvanta automatically deducts:
-   - The agreed platform service commission.
-   - Applicable Tax Deducted at Source (TDS) under Section 194-O of the Income Tax Act, 1961.
+   - Noryvanta may charge a platform fee on eligible successful transactions. The applicable platform fee is determined by the business category registered with Noryvanta:
+     - Wholesaler — **3.20%**
+     - Distributor — **5.20%**
+     - Services — **5.20%**
+     - Retailer — **8.20%**
+   - Platform fees are charged strictly to the registered business on successful transactions and are never charged as customer-side checkout additions.
+   - Applicable Tax Deducted at Source (TDS) under Section 194-O of the Income Tax Act, 1961 (1.0%).
 
 ---
 
@@ -55,5 +60,26 @@ To the maximum extent permitted by applicable law, Noryvanta shall not be liable
 
 ---
 
-## 7. Governing Law & Jurisdiction
+## 7. Quarterly Purchase & Commercial Activity Rule
+1. **Quarterly Activity Requirement**: To maintain active verified merchant status and retain full tier progression and reward unit utility, each registered commercial entity must complete at least one qualifying commercial purchase per fiscal quarter (every 90 days).
+2. **Grace Period & Status Protection**: Accounts with no recorded purchase within a 90-day cycle enter a 30-day provisional grace period before tier dormancy or reward pause occurs, ensuring business continuity.
+3. **Re-activation**: An inactive merchant account immediately regains active operational status upon executing a single verified B2B purchase through the platform escrow.
+
+---
+
+## 8. Digital Reward Units Usage Invariant (Repurchase Only)
+1. **Repurchase Exclusivity**: Noryvanta Reward Units are proprietary digital repurchase credits issued under promotional trade benchmarks. They may be redeemed solely to offset payable amounts on repurchases on the Noryvanta B2B Marketplace.
+2. **Strict Non-Withdrawal Invariant**: Reward units possess no independent fiat currency value and are **strictly non-cash and non-withdrawable**. Under no circumstances can reward units be liquidated or transferred to any personal or commercial bank account.
+3. **No Direct Inter-User Transfers**: Reward units are non-transferable and cannot be reassigned, sold, or directly transferred to any third party or external business profile.
+
+---
+
+## 9. Referral NRY ID Ecosystem & Genesis Bootstrap Architecture
+1. **Mandatory Referral Onboarding**: To preserve verified commercial network integrity, first-time business registration and initial onboarding login strictly mandate a valid, verified Referral NRY ID issued by an existing verified network participant.
+2. **Genesis Root Node**: The platform owner / super-administrator holds the sole root authority to initialize the first production-ready Noryvanta deployment without an incoming referral ID, generating the Genesis Root NRY ID.
+3. **Personal NRY ID Issuance**: Upon verified registration, every new commercial entity is provisioned a unique, immutable Personal NRY ID to share with prospective trade partners across their supply network.
+
+---
+
+## 10. Governing Law & Jurisdiction
 These Terms shall be governed by, and construed in accordance with, the laws of the Republic of India. Any legal dispute or controversy arising out of these Terms shall be subject to the exclusive jurisdiction of the competent commercial courts in Pune / Mumbai, Maharashtra.

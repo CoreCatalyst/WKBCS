@@ -1,0 +1,123 @@
+{
+  "timestamp": "2026-10-03T17:55:52.078373+00:00",
+  "database_file": "noryvanta.db",
+  "output_label": "pre_migration",
+  "commit_sha": "ffcfee07f8d613c77e18053c89a91db156613b55",
+  "migration_version": "None",
+  "active_platform_fee_rules": [
+    {
+      "id": "4882fd20-598e-480a-aa18-f47a239cd9af",
+      "fee_type": "PERCENTAGE",
+      "rate_percentage": 5.2,
+      "fixed_amount": 0.0,
+      "is_active": 1,
+      "description": "Default category platform fee",
+      "created_at": "2026-10-03 17:45:34.883106"
+    }
+  ],
+  "business_types": [
+    {
+      "business_type": "Distributor",
+      "count": 3
+    },
+    {
+      "business_type": "Registered Service Provider",
+      "count": 1
+    },
+    {
+      "business_type": "Retailer",
+      "count": 3
+    },
+    {
+      "business_type": "Service Provider",
+      "count": 2
+    },
+    {
+      "business_type": "Skilled Small-Scale Home Service Provider",
+      "count": 1
+    },
+    {
+      "business_type": "Wholesaler",
+      "count": 3
+    }
+  ],
+  "historical_transactions_count": 3,
+  "total_historical_platform_fee_amount": 4704.0,
+  "reward_ledger_records_count": 10,
+  "reward_rate_configuration": [
+    {
+      "rank": "Bronze",
+      "rate_percentage": 1.1
+    },
+    {
+      "rank": "Silver",
+      "rate_percentage": 1.2
+    },
+    {
+      "rank": "Panna",
+      "rate_percentage": 1.3
+    },
+    {
+      "rank": "Gold",
+      "rate_percentage": 1.4
+    },
+    {
+      "rank": "Platinum",
+      "rate_percentage": 1.5
+    },
+    {
+      "rank": "Ruby",
+      "rate_percentage": 1.6
+    },
+    {
+      "rank": "Sapphire",
+      "rate_percentage": 1.7
+    },
+    {
+      "rank": "Emerald",
+      "rate_percentage": 1.8
+    },
+    {
+      "rank": "Diamond",
+      "rate_percentage": 1.9
+    },
+    {
+      "rank": "Black Diamond",
+      "rate_percentage": 2.0
+    },
+    {
+      "rank": "Mythic",
+      "rate_percentage": 2.1
+    },
+    {
+      "rank": "Legendary",
+      "rate_percentage": 2.2
+    }
+  ],
+  "settlements_detail": [
+    {
+      "id": "6ae03ed9-e407-41f0-88c2-105a9ba44aa5",
+      "order_id": "a58664d5-79d9-474d-b904-c95302ef85e4",
+      "business_id": "e3fcfec0-34b1-42ee-821b-93b14fe9679d",
+      "gross_amount": 49000.0,
+      "platform_fee_rate": 3.2,
+      "platform_fee_amount": 1568.0
+    },
+    {
+      "id": "348d1dd9-9a94-4fe5-91bd-fe8941d9d60b",
+      "order_id": "3f306cf7-abf7-450f-8e27-754219e880f3",
+      "business_id": "e3fcfec0-34b1-42ee-821b-93b14fe9679d",
+      "gross_amount": 49000.0,
+      "platform_fee_rate": 3.2,
+      "platform_fee_amount": 1568.0
+    },
+    {
+      "id": "dfb3b351-b5b9-42c7-957f-55f18f06fc9c",
+      "order_id": "bec556fe-536d-4ab5-9266-2252364f2d8f",
+      "business_id": "e3fcfec0-34b1-42ee-821b-93b14fe9679d",
+      "gross_amount": 49000.0,
+      "platform_fee_rate": 3.2,
+      "platform_fee_amount": 1568.0
+    }
+  ]
+}

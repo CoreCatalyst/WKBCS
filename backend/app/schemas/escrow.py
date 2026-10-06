@@ -1,6 +1,6 @@
-from typing import Optional, List
+from typing import Optional, List, Dict, Any
 from datetime import datetime
-from pydantic import BaseModel
+from pydantic import BaseModel, ConfigDict
 
 class EscrowDepositRequest(BaseModel):
     payment_reference: str
@@ -30,8 +30,7 @@ class FeeLedgerOut(BaseModel):
     tax_percentage: float
     recorded_at: datetime
 
-    class Config:
-        from_attributes = True
+    model_config = ConfigDict(from_attributes=True)
 
 class EscrowOut(BaseModel):
     id: str
@@ -49,5 +48,68 @@ class EscrowOut(BaseModel):
     created_at: datetime
     fee_ledgers: List[FeeLedgerOut] = []
 
-    class Config:
-        from_attributes = True
+    model_config = ConfigDict(from_attributes=True)
+
+# ── Financial & Settlement Schemas ──
+
+class SettlementOut(BaseModel):
+    id: str
+    order_id: str
+    business_id: str
+    gross_amount: float
+    platform_fee_rate: float
+    platform_fee_amount: float
+    tds_rate: float
+    tds_amount: float
+    gateway_fee_amount: float
+    net_settlement_amount: float
+    status: str
+    payout_reference: Optional[str] = None
+    disbursed_at: Optional[datetime] = None
+    created_at: datetime
+
+    model_config = ConfigDict(from_attributes=True)
+
+class PlatformFeeConfigOut(BaseModel):
+    id: str
+    fee_type: str
+    rate_percentage: float
+    fixed_amount: float
+    is_active: bool
+    description: str
+
+    model_config = ConfigDict(from_attributes=True)
+
+class PlatformFeeConfigUpdate(BaseModel):
+    rate_percentage: float
+    fee_type: Optional[str] = "PERCENTAGE"
+    fixed_amount: Optional[float] = 0.0
+    description: Optional[str] = None
+
+class FinancialLedgerOut(BaseModel):
+    id: str
+    entry_type: str
+    reference_type: str
+    reference_id: str
+    amount: float
+    currency: str
+    debit_account: Optional[str] = None
+    credit_account: Optional[str] = None
+    created_at: datetime
+
+    model_config = ConfigDict(from_attributes=True)
+
+class PaymentSessionCreate(BaseModel):
+    order_id: str
+    gateway: str = "RAZORPAY"  # RAZORPAY, CASHFREE
+
+class PaymentSessionOut(BaseModel):
+    order_id: str
+    gateway: str
+    gateway_order_id: str
+    amount: float
+    currency: str
+    key_id: str
+    customer_name: Optional[str] = None
+    customer_phone: Optional[str] = None
+    customer_email: Optional[str] = None

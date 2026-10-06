@@ -7,6 +7,7 @@ import {
   Package, Users, CheckCircle2, Clock, ArrowUpRight, AlertCircle,
   Upload, Camera, Edit2, MapPin, Globe, Phone, Mail
 } from "lucide-react";
+import TieredKYCForm from "@/components/kyc/TieredKYCForm";
 
 const VENDOR_PROFILE = {
   company_name: "SafetyPro Manufacturing Pvt. Ltd.",
@@ -62,7 +63,7 @@ export default function VendorProfilePage() {
         <div className="h-24 bg-gradient-to-r from-[#0F172A] via-[#1E3A8A] to-[#1D4ED8]" />
         <div className="px-6 pb-6 -mt-10 flex flex-wrap items-end justify-between gap-4">
           <div className="flex items-end gap-4">
-            <div className="w-20 h-20 rounded-xl bg-white border-4 border-white shadow-lg flex items-center justify-center text-3xl font-black text-[#1E3A8A] font-headline">
+            <div className="w-20 h-20 rounded-xl bg-white border-4 border-white shadow-lg flex items-center justify-center text-3xl font-bold text-[#1E3A8A]">
               SP
             </div>
             <div className="mb-1">
@@ -200,33 +201,8 @@ export default function VendorProfilePage() {
       )}
 
       {activeTab === "KYC & Documents" && (
-        <div className="bg-white rounded-xl border border-[#E2E8F0] shadow-sm p-6 space-y-5">
-          <div className="flex items-center justify-between">
-            <h2 className="text-base font-bold text-[#0F172A] font-headline">KYC Documents</h2>
-            <button className="flex items-center gap-1.5 px-3 py-2 border border-[#E2E8F0] rounded-lg text-xs font-semibold text-slate-700 hover:bg-slate-50">
-              <Upload className="w-3.5 h-3.5" />Upload Document
-            </button>
-          </div>
-          <div className="space-y-3">
-            {st.documents.map((doc, i) => (
-              <div key={i} className="flex items-center justify-between p-4 bg-slate-50 rounded-xl border border-slate-200">
-                <div className="flex items-center gap-3">
-                  <FileText className="w-4 h-4 text-slate-400" />
-                  <div>
-                    <p className="text-xs font-bold text-[#0F172A]">{doc.name}</p>
-                    <p className="text-[11px] text-slate-400">Uploaded: {doc.uploaded}</p>
-                  </div>
-                </div>
-                <span className={`px-2.5 py-1 rounded-lg text-[11px] font-bold border ${
-                  doc.status === "VERIFIED"
-                    ? "bg-emerald-50 border-emerald-200 text-emerald-700"
-                    : "bg-amber-50 border-amber-200 text-amber-700"
-                }`}>
-                  {doc.status === "VERIFIED" ? <span className="flex items-center gap-1"><CheckCircle2 className="w-3 h-3" />Verified</span> : <span className="flex items-center gap-1"><Clock className="w-3 h-3" />Pending Review</span>}
-                </span>
-              </div>
-            ))}
-          </div>
+        <div className="space-y-6">
+          <TieredKYCForm />
         </div>
       )}
 

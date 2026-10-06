@@ -270,7 +270,7 @@ export default function OrdersPage() {
                       className="flex items-center gap-1.5 px-3 py-1.5 bg-[#0F172A] hover:bg-[#1E3A8A] text-white rounded-lg text-[11px] font-bold transition shadow-sm"
                     >
                       <FileText className="w-3.5 h-3.5 text-blue-300" />
-                      <span>Settlement Detail</span>
+                      <span>View Order & Invoice</span>
                     </Link>
                     <button
                       onClick={() => window.print()}
