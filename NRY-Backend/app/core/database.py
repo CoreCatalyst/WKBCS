@@ -58,6 +58,23 @@ async def init_db():
             await conn.execute(text("ALTER TABLE network_members ADD COLUMN reward_eligibility_timestamp DATETIME"))
         except Exception:
             pass
+        # Schema upgrade for listing_images media optimization columns
+        for col_def in [
+            "thumbnail_url VARCHAR(500)",
+            "thumbnail_key VARCHAR(500)",
+            "media_type VARCHAR(20) DEFAULT 'image'",
+            "status VARCHAR(50) DEFAULT 'READY'",
+            "original_size INTEGER",
+            "optimized_size INTEGER",
+            "duration_seconds FLOAT",
+            "processing_error TEXT",
+            "updated_at DATETIME"
+        ]:
+            try:
+                from sqlalchemy import text
+                await conn.execute(text(f"ALTER TABLE listing_images ADD COLUMN {col_def}"))
+            except Exception:
+                pass
 
     # Ensure essential statutory platform fee rules exist in any environment (production, test, development)
     async with AsyncSessionLocal() as session:

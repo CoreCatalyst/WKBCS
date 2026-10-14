@@ -66,3 +66,25 @@ class LocalStorageProvider(BaseStorageProvider):
     async def object_exists(self, bucket: str, path: str) -> bool:
         full_path = os.path.join(self.base_dir, bucket, path.lstrip("/"))
         return os.path.exists(full_path)
+
+    async def upload_bytes(
+        self,
+        bucket: str,
+        path: str,
+        data: bytes,
+        content_type: str = "application/octet-stream"
+    ) -> str:
+        clean_path = path.lstrip("/")
+        full_path = os.path.join(self.base_dir, bucket, clean_path)
+        os.makedirs(os.path.dirname(full_path), exist_ok=True)
+        with open(full_path, "wb") as f:
+            f.write(data)
+        return await self.get_public_url(bucket=bucket, path=clean_path)
+
+    async def download_bytes(self, bucket: str, path: str) -> bytes:
+        clean_path = path.lstrip("/")
+        full_path = os.path.join(self.base_dir, bucket, clean_path)
+        if not os.path.exists(full_path):
+            raise FileNotFoundError(f"Storage object not found: {bucket}/{clean_path}")
+        with open(full_path, "rb") as f:
+            return f.read()

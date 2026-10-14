@@ -414,5 +414,86 @@ export const apiClient = {
         ]
       }
     ];
+  },
+
+  /**
+   * Uploads and optimizes media file directly to backend with automatic thumbnail & resizing
+   */
+  async uploadListingMedia(productId: string, file: File | Blob, isPrimary: boolean = false): Promise<any> {
+    const formData = new FormData();
+    formData.append("file", file);
+    formData.append("is_primary", String(isPrimary));
+    const res = await fetch(`${API_BASE}/products/${productId}/media/upload`, {
+      method: "POST",
+      headers: {
+        Authorization: `Bearer ${localStorage.getItem("token") || ""}`,
+      },
+      body: formData,
+    });
+    if (!res.ok) {
+      const err = await res.json().catch(() => ({}));
+      throw new Error(err.detail || "Failed to upload and optimize media.");
+    }
+    return await res.json();
+  },
+
+  /**
+   * Fetches media status for a product listing
+   */
+  async getListingMediaStatus(productId: string): Promise<any> {
+    const res = await fetch(`${API_BASE}/products/${productId}/media/status`, {
+      headers: {
+        Authorization: `Bearer ${localStorage.getItem("token") || ""}`,
+      },
+    });
+    if (!res.ok) {
+      throw new Error("Failed to fetch media status.");
+    }
+    return await res.json();
+  },
+
+  /**
+   * Retries processing for a failed media item
+   */
+  async retryListingMediaProcessing(productId: string, mediaId: string): Promise<any> {
+    const res = await fetch(`${API_BASE}/products/${productId}/media/${mediaId}/retry`, {
+      method: "POST",
+      headers: {
+        Authorization: `Bearer ${localStorage.getItem("token") || ""}`,
+      },
+    });
+    if (!res.ok) {
+      throw new Error("Failed to retry media processing.");
+    }
+    return await res.json();
   }
 };
+
+export const MOBILE_LISTING_MEDIA_RULES = {
+  minImages: 4,
+  maxImages: 10,
+  maxImageSizeBytes: 10 * 1024 * 1024, // 10 MB per image
+  maxImageSizeMB: 10,
+  maxImageDimension: 1200,
+  targetImageSizeMinKB: 100,
+  targetImageSizeMaxKB: 250,
+  maxOptimizedImageKB: 500,
+  thumbnailTargetMinKB: 20,
+  thumbnailTargetMaxKB: 50,
+  preferredImageFormat: "image/webp",
+  allowedImageTypes: ["image/jpeg", "image/png", "image/webp"],
+
+  minVideos: 0,
+  maxVideos: 2,
+  maxVideoSizeBytes: 25 * 1024 * 1024, // 25 MB per video
+  maxVideoSizeMB: 25,
+  recommendedDurationMinSeconds: 10,
+  recommendedDurationMaxSeconds: 15,
+  maxVideoDurationSeconds: 30,
+  targetVideoSizeMinMB: 2,
+  targetVideoSizeMaxMB: 5,
+  maxOptimizedVideoMB: 8,
+  maxVideoResolution: "720p",
+  allowedVideoTypes: ["video/mp4", "video/webm", "video/quicktime"],
+} as const;
+

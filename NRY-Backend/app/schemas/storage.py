@@ -38,10 +38,12 @@ class UploadAuthorizationResponse(BaseModel):
 class MediaConfirmRequest(BaseModel):
     storage_key: str
     public_url: str
-    media_type: str  # "image" or "video"
-    mime_type: str
-    file_size_bytes: int
+    media_type: str = "image"  # "image" or "video"
+    mime_type: str = "image/webp"
+    file_size_bytes: int = 0
     is_primary: bool = False
+    status: Optional[str] = "READY"
+    thumbnail_url: Optional[str] = None
 
 
 class MediaDeleteRequest(BaseModel):
@@ -49,13 +51,36 @@ class MediaDeleteRequest(BaseModel):
     url: Optional[str] = None
 
 
+class MediaItemDetail(BaseModel):
+    id: str
+    listing_id: str
+    url: str
+    thumbnail_url: Optional[str] = None
+    storage_key: str
+    media_type: str  # "image" | "video"
+    status: str      # "PENDING_UPLOAD" | "UPLOADED" | "PROCESSING" | "READY" | "FAILED"
+    size: int
+    original_size: Optional[int] = None
+    optimized_size: Optional[int] = None
+    width: Optional[int] = None
+    height: Optional[int] = None
+    duration_seconds: Optional[float] = None
+    is_primary: bool = False
+    processing_error: Optional[str] = None
+
+
 class ListingMediaStatus(BaseModel):
     listing_id: str
     total_images: int
     total_videos: int
+    ready_images: int = 0
+    pending_images: int = 0
+    failed_images: int = 0
+    ready_videos: int = 0
     minimum_images_met: bool
     maximum_images_valid: bool
     maximum_videos_valid: bool
     can_publish: bool
-    images: List[str]
-    videos: List[str]
+    images: List[str] = []
+    videos: List[str] = []
+    media_items: Optional[List[MediaItemDetail]] = []

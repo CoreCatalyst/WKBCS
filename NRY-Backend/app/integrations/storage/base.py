@@ -57,3 +57,19 @@ class BaseStorageProvider(ABC):
     async def object_exists(self, bucket: str, path: str) -> bool:
         """Verifies if an object exists at the specified bucket and path."""
         pass
+
+    @abstractmethod
+    async def upload_bytes(
+        self,
+        bucket: str,
+        path: str,
+        data: bytes,
+        content_type: str = "application/octet-stream"
+    ) -> str:
+        """Directly uploads byte buffer to object storage and returns the public URL."""
+        pass
+
+    @abstractmethod
+    async def download_bytes(self, bucket: str, path: str) -> bytes:
+        """Downloads object bytes from storage."""
+        pass

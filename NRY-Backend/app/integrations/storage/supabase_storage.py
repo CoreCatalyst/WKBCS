@@ -1,4 +1,4 @@
-﻿"""
+"""
 Supabase Object Storage Provider for Noryvanta.
 Implements secure signed upload authorization, short-lived download tokens,
 and remote asset lifecycle management.
@@ -177,3 +177,55 @@ class SupabaseStorageProvider(BaseStorageProvider):
                 return resp.status_code == 200
         except Exception:
             return False
+
+    async def upload_bytes(
+        self,
+        bucket: str,
+        path: str,
+        data: bytes,
+        content_type: str = "application/octet-stream"
+    ) -> str:
+        clean_path = path.lstrip("/")
+        if not self.is_configured():
+            import os
+            local_fallback = os.path.join("media_uploads", bucket, clean_path)
+            os.makedirs(os.path.dirname(local_fallback), exist_ok=True)
+            with open(local_fallback, "wb") as f:
+                f.write(data)
+            return await self.get_public_url(bucket, clean_path)
+
+        endpoint = f"{self.supabase_url}/storage/v1/object/{bucket}/{clean_path}"
+        headers = self._get_headers()
+        headers["Content-Type"] = content_type
+        headers["x-upsert"] = "true"
+        try:
+            async with httpx.AsyncClient(timeout=30.0) as client:
+                resp = await client.post(endpoint, headers=headers, content=data)
+                if resp.status_code not in (200, 201):
+                    # Try PUT if POST fails
+                    resp = await client.put(endpoint, headers=headers, content=data)
+                return await self.get_public_url(bucket, clean_path)
+        except Exception as e:
+            logger.error(f"[Supabase Storage] Upload bytes error: {e}")
+            raise
+
+    async def download_bytes(self, bucket: str, path: str) -> bytes:
+        clean_path = path.lstrip("/")
+        if not self.is_configured():
+            import os
+            local_fallback = os.path.join("media_uploads", bucket, clean_path)
+            if os.path.exists(local_fallback):
+                with open(local_fallback, "rb") as f:
+                    return f.read()
+            raise FileNotFoundError(f"Storage object not found: {bucket}/{clean_path}")
+
+        endpoint = f"{self.supabase_url}/storage/v1/object/public/{bucket}/{clean_path}"
+        try:
+            async with httpx.AsyncClient(timeout=30.0) as client:
+                resp = await client.get(endpoint, headers=self._get_headers())
+                if resp.status_code == 200:
+                    return resp.content
+                raise FileNotFoundError(f"Failed to fetch object: {resp.status_code}")
+        except Exception as e:
+            logger.error(f"[Supabase Storage] Download bytes error: {e}")
+            raise

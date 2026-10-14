@@ -1,7 +1,7 @@
 import uuid
 import re
-from typing import List, Optional
-from fastapi import APIRouter, Depends, HTTPException, Query, status
+from typing import List, Optional, Dict, Any
+from fastapi import APIRouter, Depends, HTTPException, Query, status, UploadFile, File, Form
 from sqlalchemy.ext.asyncio import AsyncSession
 from sqlalchemy import select, or_
 from sqlalchemy.orm import selectinload
@@ -10,23 +10,113 @@ from app.core.config import settings
 from app.api.deps import get_current_user
 from app.models.user import User, RoleEnum
 from app.models.business import BusinessProfile
-from app.models.product import Product, TieredPrice, ListingImage, ListingType, ListingStatus
+from app.models.product import Product, TieredPrice, ListingImage, ListingType, ListingStatus, MediaProcessingStatus
 from app.schemas.product import (
     ProductCreate, ProductUpdate, ProductOut, AIListingRequest, AIListingResponse,
     MINIMUM_PRODUCT_IMAGES, MAXIMUM_PRODUCT_IMAGES, MAXIMUM_PRODUCT_VIDEOS
 )
 from app.schemas.storage import (
     UploadAuthorizationRequest, UploadAuthorizationResponse,
-    MediaConfirmRequest, MediaDeleteRequest, ListingMediaStatus
+    MediaConfirmRequest, MediaDeleteRequest, ListingMediaStatus, MediaItemDetail
 )
 from app.integrations.storage.storage_manager import storage_manager
 from app.services.ai_service import AIService
+from app.services.media_processor import media_processor
 
 router = APIRouter()
 
 ALLOWED_IMAGE_MIMES = {"image/jpeg", "image/png", "image/webp", "image/jpg"}
 ALLOWED_VIDEO_MIMES = {"video/mp4", "video/webm", "video/quicktime"}
 ALLOWED_DOC_MIMES = {"application/pdf", "image/jpeg", "image/png"}
+
+
+async def _get_media_status(product: Product, db: AsyncSession) -> ListingMediaStatus:
+    stmt_li = select(ListingImage).where(ListingImage.listing_id == product.id).order_by(ListingImage.display_order.asc())
+    res_li = await db.execute(stmt_li)
+    items = list(res_li.scalars().all())
+
+    # Synchronize any legacy or initial product.images URLs that lack ListingImage records
+    existing_urls = {item.url for item in items}
+    seeded = False
+    for idx, img_url in enumerate(product.images or []):
+        if img_url and img_url not in existing_urls:
+            li = ListingImage(
+                listing_id=product.id,
+                storage_key=f"initial/{uuid.uuid4().hex[:8]}",
+                url=img_url,
+                media_type="image",
+                mime_type="image/jpeg",
+                size=100000,
+                optimized_size=100000,
+                status="READY",
+                is_primary=(len(items) == 0 and idx == 0),
+                display_order=len(items)
+            )
+            db.add(li)
+            items.append(li)
+            existing_urls.add(img_url)
+            seeded = True
+    if seeded:
+        await db.commit()
+
+    image_items = [item for item in items if item.media_type != "video"]
+    video_items = [item for item in items if item.media_type == "video"]
+
+    ready_images = sum(1 for item in image_items if item.status == "READY")
+    pending_images = sum(1 for item in image_items if item.status in ("PENDING_UPLOAD", "UPLOADED", "PROCESSING"))
+    failed_images = sum(1 for item in image_items if item.status == "FAILED")
+    ready_videos = sum(1 for item in video_items if item.status == "READY")
+
+    total_images = len(image_items)
+    total_videos = len(video_items)
+
+    min_images_met = (ready_images >= MINIMUM_PRODUCT_IMAGES)
+    max_images_valid = (total_images <= MAXIMUM_PRODUCT_IMAGES)
+    max_videos_valid = (total_videos <= MAXIMUM_PRODUCT_VIDEOS)
+
+    can_publish = (
+        min_images_met and
+        max_images_valid and
+        max_videos_valid
+    )
+
+    details = [
+        MediaItemDetail(
+            id=item.id,
+            listing_id=item.listing_id,
+            url=item.url,
+            thumbnail_url=item.thumbnail_url,
+            storage_key=item.storage_key,
+            media_type=item.media_type,
+            status=item.status,
+            size=item.size,
+            original_size=item.original_size,
+            optimized_size=item.optimized_size,
+            width=item.width,
+            height=item.height,
+            duration_seconds=item.duration_seconds,
+            is_primary=item.is_primary,
+            processing_error=item.processing_error
+        )
+        for item in items
+    ]
+
+    return ListingMediaStatus(
+        listing_id=product.id,
+        total_images=total_images,
+        total_videos=total_videos,
+        ready_images=ready_images,
+        pending_images=pending_images,
+        failed_images=failed_images,
+        ready_videos=ready_videos,
+        minimum_images_met=min_images_met,
+        maximum_images_valid=max_images_valid,
+        maximum_videos_valid=max_videos_valid,
+        can_publish=can_publish,
+        images=product.images or [],
+        videos=product.videos or [],
+        media_items=details
+    )
 
 
 @router.get("", response_model=List[ProductOut], summary="List and search products")
@@ -236,7 +326,7 @@ async def create_product(
         stock_quantity=payload.stock_quantity,
         status=initial_status,
         is_active=is_active_initial,
-        images=images or ["https://images.unsplash.com/photo-1581092160607-ee22621dd758?auto=format&fit=crop&w=800&q=80"],
+        images=payload.images if payload.images is not None else ["https://images.unsplash.com/photo-1581092160607-ee22621dd758?auto=format&fit=crop&w=800&q=80"],
         videos=videos,
         specifications=payload.specifications or {}
     )
@@ -357,15 +447,19 @@ async def confirm_media_upload(
             current_images.append(payload.public_url)
             product.images = current_images
 
-        # Create ListingImage relational record
+        # Create/Update ListingImage relational record
         new_img = ListingImage(
             listing_id=product.id,
             storage_key=payload.storage_key,
             url=payload.public_url,
+            thumbnail_url=payload.thumbnail_url,
+            media_type="image",
+            status=payload.status or "READY",
             is_primary=payload.is_primary or (len(current_images) == 1),
             display_order=len(current_images),
             mime_type=payload.mime_type,
-            size=payload.file_size_bytes
+            size=payload.file_size_bytes,
+            optimized_size=payload.file_size_bytes
         )
         db.add(new_img)
 
@@ -379,23 +473,274 @@ async def confirm_media_upload(
             current_videos.append(payload.public_url)
             product.videos = current_videos
 
+        new_vid = ListingImage(
+            listing_id=product.id,
+            storage_key=payload.storage_key,
+            url=payload.public_url,
+            thumbnail_url=payload.thumbnail_url,
+            media_type="video",
+            status=payload.status or "READY",
+            is_primary=False,
+            display_order=len(current_videos),
+            mime_type=payload.mime_type,
+            size=payload.file_size_bytes,
+            optimized_size=payload.file_size_bytes
+        )
+        db.add(new_vid)
+
     await db.commit()
     await db.refresh(product)
+    return await _get_media_status(product, db)
 
-    img_count = len(product.images or [])
-    vid_count = len(product.videos or [])
 
-    return ListingMediaStatus(
-        listing_id=product.id,
-        total_images=img_count,
-        total_videos=vid_count,
-        minimum_images_met=(img_count >= MINIMUM_PRODUCT_IMAGES),
-        maximum_images_valid=(img_count <= MAXIMUM_PRODUCT_IMAGES),
-        maximum_videos_valid=(vid_count <= MAXIMUM_PRODUCT_VIDEOS),
-        can_publish=(img_count >= MINIMUM_PRODUCT_IMAGES and img_count <= MAXIMUM_PRODUCT_IMAGES and vid_count <= MAXIMUM_PRODUCT_VIDEOS),
-        images=product.images or [],
-        videos=product.videos or []
-    )
+@router.post("/{product_id}/media/upload", response_model=ListingMediaStatus, summary="Directly upload and optimize listing media")
+async def upload_listing_media(
+    product_id: str,
+    file: UploadFile = File(...),
+    media_type: str = Form("image"),
+    is_primary: bool = Form(False),
+    current_user: User = Depends(get_current_user),
+    db: AsyncSession = Depends(get_db)
+):
+    """
+    Direct server-side upload and optimization pipeline for Web and Mobile:
+    - Images: Strips EXIF/GPS, resizes <= 1200x1200 (no upscaling), converts to WebP,
+              adaptive compression (100–250 KB target, 500 KB limit), generates 20–50 KB thumbnail.
+    - Videos: 25 MB max, max 30s duration, 720p H.264 MP4 (2–5 MB target, 8 MB limit),
+              generates poster thumbnail. NEVER marks video as optimized if FFmpeg fails.
+    - Updates states: UPLOADED -> PROCESSING -> READY / FAILED.
+    """
+    stmt = select(BusinessProfile).where(BusinessProfile.user_id == current_user.id)
+    res = await db.execute(stmt)
+    biz = res.scalars().first()
+    if not biz and current_user.role != RoleEnum.SUPER_ADMIN:
+        raise HTTPException(status_code=status.HTTP_403_FORBIDDEN, detail="Business profile required.")
+
+    stmt_p = select(Product).where(Product.id == product_id)
+    res_p = await db.execute(stmt_p)
+    product = res_p.scalars().first()
+    if not product:
+        raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="Listing not found.")
+
+    if biz and product.business_id != biz.id and current_user.role != RoleEnum.SUPER_ADMIN:
+        raise HTTPException(status_code=status.HTTP_403_FORBIDDEN, detail="Not authorized.")
+
+    clean_type = media_type.lower().strip()
+    raw_bytes = await file.read()
+    file_size = len(raw_bytes)
+    filename = file.filename or ("upload.jpg" if clean_type == "image" else "upload.mp4")
+    content_type = file.content_type or ("image/jpeg" if clean_type == "image" else "video/mp4")
+
+    # Quota validation
+    current_images = list(product.images or [])
+    current_videos = list(product.videos or [])
+
+    if clean_type == "image":
+        if len(current_images) >= MAXIMUM_PRODUCT_IMAGES:
+            raise HTTPException(
+                status_code=status.HTTP_400_BAD_REQUEST,
+                detail=f"Listing already has maximum {MAXIMUM_PRODUCT_IMAGES} images."
+            )
+        if file_size > settings.MAX_IMAGE_SIZE_BYTES:
+            max_mb = settings.MAX_IMAGE_SIZE_BYTES // (1024 * 1024)
+            raise HTTPException(
+                status_code=status.HTTP_400_BAD_REQUEST,
+                detail=f"Image file size exceeds maximum {max_mb} MB."
+            )
+
+        # Run Image Optimization
+        opt_res = media_processor.optimize_image(raw_bytes, original_filename=filename)
+        bucket = settings.SUPABASE_STORAGE_BUCKET_PUBLIC
+
+        if opt_res.success:
+            unique_base = f"businesses/{product.business_id}/listings/{product.id}/{uuid.uuid4().hex[:10]}"
+            main_key = f"{unique_base}.webp"
+            thumb_key = f"{unique_base}_thumb.webp"
+
+            main_url = await storage_manager.upload_bytes(
+                bucket=bucket,
+                path=main_key,
+                data=opt_res.optimized_bytes,
+                content_type=opt_res.optimized_mime
+            )
+            thumb_url = None
+            if opt_res.thumbnail_bytes:
+                thumb_url = await storage_manager.upload_bytes(
+                    bucket=bucket,
+                    path=thumb_key,
+                    data=opt_res.thumbnail_bytes,
+                    content_type=opt_res.thumbnail_mime or "image/webp"
+                )
+
+            current_images.append(main_url)
+            product.images = current_images
+
+            media_rec = ListingImage(
+                listing_id=product.id,
+                storage_key=main_key,
+                url=main_url,
+                thumbnail_url=thumb_url,
+                thumbnail_key=thumb_key,
+                media_type="image",
+                status="READY",
+                is_primary=is_primary or (len(current_images) == 1),
+                display_order=len(current_images),
+                mime_type=opt_res.optimized_mime,
+                size=opt_res.optimized_size,
+                original_size=opt_res.original_size,
+                optimized_size=opt_res.optimized_size,
+                width=opt_res.width,
+                height=opt_res.height
+            )
+            db.add(media_rec)
+        else:
+            # Record failed state
+            media_rec = ListingImage(
+                listing_id=product.id,
+                storage_key=f"failed/{uuid.uuid4().hex[:8]}_{filename}",
+                url="",
+                media_type="image",
+                status="FAILED",
+                mime_type=content_type,
+                size=file_size,
+                original_size=file_size,
+                processing_error=opt_res.error
+            )
+            db.add(media_rec)
+
+    elif clean_type == "video":
+        if len(current_videos) >= MAXIMUM_PRODUCT_VIDEOS:
+            raise HTTPException(
+                status_code=status.HTTP_400_BAD_REQUEST,
+                detail=f"Listing already has maximum {MAXIMUM_PRODUCT_VIDEOS} videos."
+            )
+        if file_size > settings.MAX_VIDEO_SIZE_BYTES:
+            max_mb = settings.MAX_VIDEO_SIZE_BYTES // (1024 * 1024)
+            raise HTTPException(
+                status_code=status.HTTP_400_BAD_REQUEST,
+                detail=f"Video file size exceeds maximum {max_mb} MB (max 30s duration)."
+            )
+
+        # Run Video Optimization (FFmpeg check enforced)
+        opt_res = media_processor.optimize_video(raw_bytes, original_filename=filename)
+        bucket = settings.SUPABASE_STORAGE_BUCKET_PUBLIC
+
+        if opt_res.success and opt_res.optimized_bytes:
+            unique_base = f"businesses/{product.business_id}/listings/{product.id}/{uuid.uuid4().hex[:10]}"
+            main_key = f"{unique_base}.mp4"
+            thumb_key = f"{unique_base}_poster.webp"
+
+            main_url = await storage_manager.upload_bytes(
+                bucket=bucket,
+                path=main_key,
+                data=opt_res.optimized_bytes,
+                content_type=opt_res.optimized_mime or "video/mp4"
+            )
+            thumb_url = None
+            if opt_res.thumbnail_bytes:
+                thumb_url = await storage_manager.upload_bytes(
+                    bucket=bucket,
+                    path=thumb_key,
+                    data=opt_res.thumbnail_bytes,
+                    content_type=opt_res.thumbnail_mime or "image/webp"
+                )
+
+            current_videos.append(main_url)
+            product.videos = current_videos
+
+            media_rec = ListingImage(
+                listing_id=product.id,
+                storage_key=main_key,
+                url=main_url,
+                thumbnail_url=thumb_url,
+                thumbnail_key=thumb_key,
+                media_type="video",
+                status="READY",
+                is_primary=False,
+                display_order=len(current_videos),
+                mime_type="video/mp4",
+                size=opt_res.optimized_size or file_size,
+                original_size=opt_res.original_size,
+                optimized_size=opt_res.optimized_size,
+                duration_seconds=opt_res.duration_seconds
+            )
+            db.add(media_rec)
+        else:
+            # Video optimization failed or FFmpeg unavailable (Rule 10: NEVER mark video as ready if failed)
+            media_rec = ListingImage(
+                listing_id=product.id,
+                storage_key=f"failed/{uuid.uuid4().hex[:8]}_{filename}",
+                url="",
+                media_type="video",
+                status="FAILED",
+                mime_type=content_type,
+                size=file_size,
+                original_size=file_size,
+                processing_error=opt_res.error or "Video optimization failed."
+            )
+            db.add(media_rec)
+
+    await db.commit()
+    await db.refresh(product)
+    return await _get_media_status(product, db)
+
+
+@router.get("/{product_id}/media/status", response_model=ListingMediaStatus, summary="Get listing media status and ready counts")
+async def get_media_status_endpoint(
+    product_id: str,
+    db: AsyncSession = Depends(get_db)
+):
+    stmt_p = select(Product).where(Product.id == product_id)
+    res_p = await db.execute(stmt_p)
+    product = res_p.scalars().first()
+    if not product:
+        raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="Listing not found.")
+    return await _get_media_status(product, db)
+
+
+@router.post("/{product_id}/media/{media_id}/retry", response_model=ListingMediaStatus, summary="Retry failed media processing")
+async def retry_media_processing(
+    product_id: str,
+    media_id: str,
+    current_user: User = Depends(get_current_user),
+    db: AsyncSession = Depends(get_db)
+):
+    stmt = select(BusinessProfile).where(BusinessProfile.user_id == current_user.id)
+    res = await db.execute(stmt)
+    biz = res.scalars().first()
+    if not biz and current_user.role != RoleEnum.SUPER_ADMIN:
+        raise HTTPException(status_code=status.HTTP_403_FORBIDDEN, detail="Business profile required.")
+
+    stmt_p = select(Product).where(Product.id == product_id)
+    res_p = await db.execute(stmt_p)
+    product = res_p.scalars().first()
+    if not product:
+        raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="Listing not found.")
+
+    if biz and product.business_id != biz.id and current_user.role != RoleEnum.SUPER_ADMIN:
+        raise HTTPException(status_code=status.HTTP_403_FORBIDDEN, detail="Not authorized.")
+
+    stmt_m = select(ListingImage).where((ListingImage.id == media_id) & (ListingImage.listing_id == product.id))
+    res_m = await db.execute(stmt_m)
+    media_item = res_m.scalars().first()
+    if not media_item:
+        raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="Media item not found.")
+
+    # Mark as PROCESSING while retrying
+    media_item.status = "PROCESSING"
+    media_item.processing_error = None
+    await db.commit()
+
+    # If it was an image without a valid URL, retry is ready for a fresh upload
+    if media_item.media_type == "video" and not media_processor.is_ffmpeg_available():
+        media_item.status = "FAILED"
+        media_item.processing_error = "FFmpeg is not available in the infrastructure to transcode video."
+    else:
+        # Mark as PENDING_UPLOAD so user can stream replacement
+        media_item.status = "PENDING_UPLOAD"
+
+    await db.commit()
+    return await _get_media_status(product, db)
 
 
 @router.delete("/{product_id}/media", response_model=ListingMediaStatus, summary="Delete media item from listing")
@@ -457,21 +802,7 @@ async def delete_listing_media(
 
     await db.commit()
     await db.refresh(product)
-
-    img_count = len(product.images or [])
-    vid_count = len(product.videos or [])
-
-    return ListingMediaStatus(
-        listing_id=product.id,
-        total_images=img_count,
-        total_videos=vid_count,
-        minimum_images_met=(img_count >= MINIMUM_PRODUCT_IMAGES),
-        maximum_images_valid=(img_count <= MAXIMUM_PRODUCT_IMAGES),
-        maximum_videos_valid=(vid_count <= MAXIMUM_PRODUCT_VIDEOS),
-        can_publish=(img_count >= MINIMUM_PRODUCT_IMAGES and img_count <= MAXIMUM_PRODUCT_IMAGES and vid_count <= MAXIMUM_PRODUCT_VIDEOS),
-        images=product.images or [],
-        videos=product.videos or []
-    )
+    return await _get_media_status(product, db)
 
 
 @router.post("/{product_id}/publish", response_model=ProductOut, summary="Validate and publish product listing")
@@ -482,9 +813,9 @@ async def publish_listing(
 ):
     """
     Validates complete listing requirements before publishing:
-    - Minimum 4 images mandatory
-    - Maximum 10 images allowed
-    - Maximum 2 short videos allowed
+    - Minimum 4 READY images mandatory (Rule 1 & Publication Rule)
+    - Maximum 10 images allowed (Rule 2)
+    - Maximum 2 optional videos allowed (Video Rule 1)
     - Valid base price and MOQ
     """
     stmt = select(BusinessProfile).where(BusinessProfile.user_id == current_user.id)
@@ -502,19 +833,50 @@ async def publish_listing(
     if biz and product.business_id != biz.id and current_user.role != RoleEnum.SUPER_ADMIN:
         raise HTTPException(status_code=status.HTTP_403_FORBIDDEN, detail="Not authorized.")
 
-    images = product.images or []
-    videos = product.videos or []
+    images = list(product.images or [])
+    videos = list(product.videos or [])
 
-    if len(images) < MINIMUM_PRODUCT_IMAGES:
+    # Check relational ListingImage READY status
+    stmt_li = select(ListingImage).where(
+        (ListingImage.listing_id == product.id) &
+        (ListingImage.media_type != "video") &
+        (ListingImage.status == "READY")
+    )
+    ready_images_records = (await db.execute(stmt_li)).scalars().all()
+    ready_count = len(ready_images_records)
+
+    # Backwards compatibility: If no ListingImage records exist yet, but product.images has >= 4 URLs
+    if ready_count == 0 and len(images) >= MINIMUM_PRODUCT_IMAGES:
+        for idx, img_url in enumerate(images):
+            seeded_img = ListingImage(
+                listing_id=product.id,
+                storage_key=f"businesses/{product.business_id}/listings/{product.id}/seed_{idx}.webp",
+                url=img_url,
+                media_type="image",
+                status="READY",
+                mime_type="image/webp",
+                size=150000,
+                optimized_size=150000,
+                is_primary=(idx == 0),
+                display_order=idx
+            )
+            db.add(seeded_img)
+        await db.commit()
+        ready_count = len(images)
+
+    # Rule 1 & Publication Rule: Minimum 4 READY images mandatory
+    if ready_count < MINIMUM_PRODUCT_IMAGES:
         raise HTTPException(
             status_code=status.HTTP_400_BAD_REQUEST,
-            detail=f"A minimum of {MINIMUM_PRODUCT_IMAGES} images are required to publish. Currently has {len(images)}."
+            detail=f"A minimum of {MINIMUM_PRODUCT_IMAGES} READY images are required to publish. Currently has {ready_count} ready images."
         )
+
     if len(images) > MAXIMUM_PRODUCT_IMAGES:
         raise HTTPException(
             status_code=status.HTTP_400_BAD_REQUEST,
             detail=f"A maximum of {MAXIMUM_PRODUCT_IMAGES} images are allowed. Currently has {len(images)}."
         )
+
     if len(videos) > MAXIMUM_PRODUCT_VIDEOS:
         raise HTTPException(
             status_code=status.HTTP_400_BAD_REQUEST,

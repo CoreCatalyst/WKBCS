@@ -24,7 +24,9 @@ class StorageManager:
         if provider_name == "supabase":
             cls._provider_cache = SupabaseStorageProvider()
         elif provider_name in ("s3", "aws"):
-            cls._provider_cache = S3StorageProvider()
+            cls._provider_cache = S3StorageProvider(is_r2=False)
+        elif provider_name in ("r2", "cloudflare"):
+            cls._provider_cache = S3StorageProvider(is_r2=True)
         elif provider_name == "local":
             cls._provider_cache = LocalStorageProvider()
         else:
@@ -76,6 +78,22 @@ class StorageManager:
     async def file_exists(cls, bucket: str, path: str) -> bool:
         provider = cls.get_provider()
         return await provider.object_exists(bucket=bucket, path=path)
+
+    @classmethod
+    async def upload_bytes(
+        cls,
+        bucket: str,
+        path: str,
+        data: bytes,
+        content_type: str = "application/octet-stream"
+    ) -> str:
+        provider = cls.get_provider()
+        return await provider.upload_bytes(bucket=bucket, path=path, data=data, content_type=content_type)
+
+    @classmethod
+    async def download_bytes(cls, bucket: str, path: str) -> bytes:
+        provider = cls.get_provider()
+        return await provider.download_bytes(bucket=bucket, path=path)
 
 
 storage_manager = StorageManager()

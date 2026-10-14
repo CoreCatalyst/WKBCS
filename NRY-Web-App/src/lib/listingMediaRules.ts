@@ -9,39 +9,55 @@
  */
 
 export const LISTING_MEDIA_RULES = {
-  // Images
+  // Images: 4-10 mandatory, 100-250 KB target (up to 500 KB ceiling), 10 MB upload limit, max 1200x1200px (no upscaling)
   minImages: 4,
   maxImages: 10,
-  maxImageSizeBytes: 5 * 1024 * 1024, // 5 MB
-  maxImageSizeMB: 5,
-  minImageWidth: 800,
-  minImageHeight: 800,
+  maxImageSizeBytes: 10 * 1024 * 1024, // 10 MB per image
+  maxImageSizeMB: 10,
+  maxImageDimension: 1200,
+  minImageWidth: 200,
+  minImageHeight: 200,
+  targetImageSizeMinKB: 100,
+  targetImageSizeMaxKB: 250,
+  maxOptimizedImageKB: 500,
+  thumbnailTargetMinKB: 20,
+  thumbnailTargetMaxKB: 50,
+  preferredImageFormat: "image/webp",
   allowedImageTypes: ["image/jpeg", "image/png", "image/webp"],
   allowedImageExtensions: [".jpg", ".jpeg", ".png", ".webp"],
 
-  // Videos
+  // Videos: 0-2 optional, 10-15s recommended (30s max), 25 MB upload limit, 2-5 MB target (8 MB ceiling), 720p H.264
   minVideos: 0,
   maxVideos: 2,
-  maxVideoSizeBytes: 20 * 1024 * 1024, // 20 MB hard upload limit
-  maxVideoSizeMB: 20,
+  maxVideoSizeBytes: 25 * 1024 * 1024, // 25 MB upload limit
+  maxVideoSizeMB: 25,
+  recommendedDurationMinSeconds: 10,
+  recommendedDurationMaxSeconds: 15,
   maxVideoDurationSeconds: 30,
-  allowedVideoTypes: ["video/mp4", "video/webm"],
-  allowedVideoExtensions: [".mp4", ".webm"],
-  maxVideoResolutionWidth: 1920,
-  maxVideoResolutionHeight: 1080,
+  targetVideoSizeMinMB: 2,
+  targetVideoSizeMaxMB: 5,
+  maxOptimizedVideoMB: 8,
+  maxVideoResolution: "720p",
+  maxVideoResolutionWidth: 1280,
+  maxVideoResolutionHeight: 720,
+  allowedVideoTypes: ["video/mp4", "video/webm", "video/quicktime"],
+  allowedVideoExtensions: [".mp4", ".webm", ".mov"],
 } as const;
 
 export type UploadState =
-  | "PENDING"
+  | "PENDING_UPLOAD"
   | "UPLOADING"
   | "UPLOADED"
   | "UPLOAD_FAILED"
   | "CANCELLED";
 
 export type ProcessingState =
-  | "NOT_STARTED"
+  | "PENDING_UPLOAD"
+  | "UPLOADED"
   | "PROCESSING"
   | "READY"
+  | "FAILED"
+  | "NOT_STARTED"
   | "PROCESSING_FAILED";
 
 export interface MediaItem {
@@ -87,11 +103,11 @@ export async function validateImageFile(
     };
   }
 
-  // 2. File Size Check (Hard 5 MB Limit)
+  // 2. File Size Check (10 MB Limit)
   if (file.size > LISTING_MEDIA_RULES.maxImageSizeBytes) {
     return {
       valid: false,
-      error: "Image is too large. Maximum file size is 5 MB per image.",
+      error: `Image is too large. Maximum file size is ${LISTING_MEDIA_RULES.maxImageSizeMB} MB per image.`,
     };
   }
 
@@ -109,7 +125,7 @@ export async function validateImageFile(
     };
   }
 
-  // 4. Dimension Check (Min 800x800)
+  // 4. Dimension Check (Min 200x200)
   try {
     const dimensions = await getImageDimensions(file);
     if (
@@ -118,7 +134,7 @@ export async function validateImageFile(
     ) {
       return {
         valid: false,
-        error: `Image resolution is too low (${dimensions.width}×${dimensions.height}). Please upload an image of at least 800 × 800 pixels.`,
+        error: `Image resolution is too low (${dimensions.width}×${dimensions.height}). Minimum dimension is ${LISTING_MEDIA_RULES.minImageWidth} × ${LISTING_MEDIA_RULES.minImageHeight} pixels.`,
       };
     }
     return { valid: true, width: dimensions.width, height: dimensions.height };
@@ -131,10 +147,10 @@ export async function validateImageFile(
 }
 
 /**
- * Validate a Video file strictly against Section 1-5 & Resolve Conflict rules:
- * - Hard upload limit: 20 MB
+ * Validate a Video file strictly against rules:
+ * - Upload limit: 25 MB
  * - Max duration: 30 seconds
- * - Format: MP4 / WEBM
+ * - Format: MP4 / WEBM / MOV
  */
 export async function validateVideoFile(
   file: File,
@@ -153,11 +169,11 @@ export async function validateVideoFile(
     };
   }
 
-  // 2. Hard 20 MB Upload Limit (Compression cannot bypass this!)
+  // 2. 25 MB Upload Limit
   if (file.size > LISTING_MEDIA_RULES.maxVideoSizeBytes) {
     return {
       valid: false,
-      error: "Video is too large. Maximum upload size is 20 MB per video.",
+      error: `Video is too large. Maximum upload size is ${LISTING_MEDIA_RULES.maxVideoSizeMB} MB per video.`,
     };
   }
 

@@ -1,4 +1,4 @@
-﻿import pytest
+import pytest
 from httpx import AsyncClient, ASGITransport
 from app.main import app
 from app.core.config import settings
@@ -178,12 +178,12 @@ async def test_media_upload_authorization_and_validation():
         assert invalid_mime_res.status_code == 400
         assert "Invalid image format" in invalid_mime_res.json()["detail"]
 
-        # 3. Reject oversized image (> 5 MB)
+        # 3. Reject oversized image (> 10 MB)
         oversized_res = await ac.post("/api/v1/products/media/request-upload", headers=headers, json={
             "media_type": "image",
             "file_name": "huge_banner.jpg",
             "mime_type": "image/jpeg",
-            "file_size_bytes": 10 * 1024 * 1024  # 10 MB
+            "file_size_bytes": 12 * 1024 * 1024  # 12 MB (> 10 MB limit)
         })
         assert oversized_res.status_code == 400
         assert "exceeds maximum" in oversized_res.json()["detail"]

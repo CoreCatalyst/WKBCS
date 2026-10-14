@@ -163,6 +163,73 @@ export const productApi = {
   },
 
   /**
+   * Uploads and optimizes media file directly to backend with automatic thumbnail & resizing
+   */
+  uploadMediaFile: async (
+    productId: string,
+    file: File,
+    isPrimary?: boolean
+  ): Promise<{
+    id: string;
+    url: string;
+    thumbnail_url?: string;
+    media_type: "image" | "video";
+    status: string;
+    original_size: number;
+    optimized_size: number;
+  }> => {
+    const formData = new FormData();
+    formData.append("file", file);
+    if (isPrimary !== undefined) {
+      formData.append("is_primary", String(isPrimary));
+    }
+    return apiClient.post(`/products/${productId}/media/upload`, formData, {
+      headers: { "Content-Type": "multipart/form-data" },
+    });
+  },
+
+  /**
+   * Fetches the current media upload and processing status for a listing
+   */
+  getMediaStatus: async (
+    productId: string
+  ): Promise<{
+    listing_id: string;
+    total_images: number;
+    ready_images: number;
+    pending_images: number;
+    failed_images: number;
+    total_videos: number;
+    ready_videos: number;
+    minimum_images_met: boolean;
+    can_publish: boolean;
+    media_items: Array<{
+      id: string;
+      url: string;
+      thumbnail_url?: string;
+      media_type: string;
+      status: string;
+      original_size: number;
+      optimized_size: number;
+      duration_seconds?: number;
+      is_primary: boolean;
+      processing_error?: string;
+    }>;
+  }> => {
+    return apiClient.get(`/products/${productId}/media/status`);
+  },
+
+  /**
+   * Retries optimization for a failed media item
+   */
+  retryMediaProcessing: async (
+    productId: string,
+    mediaId: string
+  ): Promise<{ message: string; media_id: string; status: string }> => {
+    return apiClient.post(`/products/${productId}/media/${mediaId}/retry`, {});
+  },
+
+  /**
    * Validates and publishes product listing
    */
   publish: async (productId: string): Promise<ProductListing> => {

@@ -90,6 +90,8 @@ infra/nginx/ssl/*.crt
 # ─── Uploads / Storage ────────────────────────────────────────
 uploads/
 **/uploads/
+media_uploads/
+**/media_uploads/
 *.pdf
 *.tmp
 

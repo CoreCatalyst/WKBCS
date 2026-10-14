@@ -67,6 +67,14 @@ class Product(Base):
     tiered_prices = relationship("TieredPrice", back_populates="product", cascade="all, delete-orphan")
     listing_images = relationship("ListingImage", back_populates="product", cascade="all, delete-orphan")
 
+class MediaProcessingStatus(str, Enum):
+    PENDING_UPLOAD = "PENDING_UPLOAD"
+    UPLOADED = "UPLOADED"
+    PROCESSING = "PROCESSING"
+    READY = "READY"
+    FAILED = "FAILED"
+
+
 class ListingImage(Base):
     __tablename__ = "listing_images"
 
@@ -74,13 +82,22 @@ class ListingImage(Base):
     listing_id = Column(String(36), ForeignKey("products.id", ondelete="CASCADE"), nullable=False)
     storage_key = Column(String(500), nullable=False)
     url = Column(String(500), nullable=False)
+    thumbnail_url = Column(String(500), nullable=True)
+    thumbnail_key = Column(String(500), nullable=True)
+    media_type = Column(String(20), default="image", nullable=False)  # "image" | "video"
+    status = Column(String(50), default="READY", nullable=False)      # PENDING_UPLOAD, UPLOADED, PROCESSING, READY, FAILED
     is_primary = Column(Boolean, default=False, nullable=False)
     display_order = Column(Integer, default=0, nullable=False)
     mime_type = Column(String(100), nullable=False)
-    size = Column(Integer, nullable=False)
+    size = Column(Integer, nullable=False)                            # Current / optimized size in bytes
+    original_size = Column(Integer, nullable=True)                    # Original pre-optimization size
+    optimized_size = Column(Integer, nullable=True)                   # Final optimized size
     width = Column(Integer, nullable=True)
     height = Column(Integer, nullable=True)
+    duration_seconds = Column(Float, nullable=True)                   # Video duration
+    processing_error = Column(Text, nullable=True)
     created_at = Column(DateTime, default=lambda: datetime.now(timezone.utc), nullable=False)
+    updated_at = Column(DateTime, default=lambda: datetime.now(timezone.utc), onupdate=lambda: datetime.now(timezone.utc), nullable=False)
 
     product = relationship("Product", back_populates="listing_images")
 

@@ -27,8 +27,41 @@ class Settings(BaseSettings):
     SUPABASE_SERVICE_KEY: str = os.getenv("SUPABASE_SERVICE_ROLE_KEY", os.getenv("SUPABASE_SERVICE_KEY", ""))
     SUPABASE_STORAGE_BUCKET_PUBLIC: str = os.getenv("SUPABASE_STORAGE_BUCKET_PUBLIC", "noryvanta-public")
     SUPABASE_STORAGE_BUCKET_PRIVATE: str = os.getenv("SUPABASE_STORAGE_BUCKET_PRIVATE", "noryvanta-private")
-    MAX_IMAGE_SIZE_BYTES: int = int(os.getenv("MAX_IMAGE_SIZE_BYTES", str(5 * 1024 * 1024)))  # 5 MB
-    MAX_VIDEO_SIZE_BYTES: int = int(os.getenv("MAX_VIDEO_SIZE_BYTES", str(20 * 1024 * 1024)))  # 20 MB
+
+    # ─── Media Optimization & Storage Constraints ───
+    # Image Rules: 4-10 images, 100-250 KB target (up to 500 KB limit), 10 MB upload limit, 1200px max
+    MINIMUM_LISTING_IMAGES: int = int(os.getenv("MINIMUM_LISTING_IMAGES", "4"))
+    MAXIMUM_LISTING_IMAGES: int = int(os.getenv("MAXIMUM_LISTING_IMAGES", "10"))
+    MAX_IMAGE_SIZE_BYTES: int = int(os.getenv("MAX_IMAGE_SIZE_BYTES", str(10 * 1024 * 1024)))  # 10 MB per image
+    IMAGE_TARGET_MIN_KB: int = int(os.getenv("IMAGE_TARGET_MIN_KB", "100"))                     # 100 KB
+    IMAGE_TARGET_MAX_KB: int = int(os.getenv("IMAGE_TARGET_MAX_KB", "250"))                     # 250 KB
+    IMAGE_MAX_OPTIMIZED_KB: int = int(os.getenv("IMAGE_MAX_OPTIMIZED_KB", "500"))               # 500 KB quality ceiling
+    IMAGE_MAX_DIMENSION: int = int(os.getenv("IMAGE_MAX_DIMENSION", "1200"))                     # 1200x1200 max px
+    THUMBNAIL_MAX_DIMENSION: int = int(os.getenv("THUMBNAIL_MAX_DIMENSION", "300"))             # 300x300 px
+    THUMBNAIL_TARGET_MIN_KB: int = int(os.getenv("THUMBNAIL_TARGET_MIN_KB", "20"))               # 20 KB
+    THUMBNAIL_TARGET_MAX_KB: int = int(os.getenv("THUMBNAIL_TARGET_MAX_KB", "50"))               # 50 KB
+    IMAGE_OUTPUT_FORMAT: str = os.getenv("IMAGE_OUTPUT_FORMAT", "WEBP").upper()                  # WebP preferred
+    STRIP_EXIF_METADATA: bool = os.getenv("STRIP_EXIF_METADATA", "true").lower() in ("true", "1", "yes")
+
+    # Video Rules: max 2, 10-15s recommended (30s max), 25 MB upload limit, 2-5 MB target (8 MB max), 720p H.264
+    MAXIMUM_LISTING_VIDEOS: int = int(os.getenv("MAXIMUM_LISTING_VIDEOS", "2"))
+    MAX_VIDEO_SIZE_BYTES: int = int(os.getenv("MAX_VIDEO_SIZE_BYTES", str(25 * 1024 * 1024)))  # 25 MB per video
+    VIDEO_MIN_RECOMMENDED_DURATION_SECONDS: int = int(os.getenv("VIDEO_MIN_RECOMMENDED_DURATION_SECONDS", "10"))
+    VIDEO_MAX_RECOMMENDED_DURATION_SECONDS: int = int(os.getenv("VIDEO_MAX_RECOMMENDED_DURATION_SECONDS", "15"))
+    VIDEO_MAX_DURATION_SECONDS: int = int(os.getenv("VIDEO_MAX_DURATION_SECONDS", "30"))        # 30s max duration
+    VIDEO_TARGET_MIN_MB: float = float(os.getenv("VIDEO_TARGET_MIN_MB", "2.0"))                 # 2 MB target
+    VIDEO_TARGET_MAX_MB: float = float(os.getenv("VIDEO_TARGET_MAX_MB", "5.0"))                 # 5 MB target
+    VIDEO_MAX_OPTIMIZED_MB: float = float(os.getenv("VIDEO_MAX_OPTIMIZED_MB", "8.0"))           # 8 MB upper limit
+    VIDEO_MAX_RESOLUTION: str = os.getenv("VIDEO_MAX_RESOLUTION", "720p")
+    VIDEO_CODEC: str = os.getenv("VIDEO_CODEC", "h264")
+
+    # Cloudflare R2 / S3 Custom Storage
+    CLOUDFLARE_R2_ACCOUNT_ID: str = os.getenv("CLOUDFLARE_R2_ACCOUNT_ID", "")
+    CLOUDFLARE_R2_BUCKET: str = os.getenv("CLOUDFLARE_R2_BUCKET", "")
+    CLOUDFLARE_R2_ACCESS_KEY_ID: str = os.getenv("CLOUDFLARE_R2_ACCESS_KEY_ID", "")
+    CLOUDFLARE_R2_SECRET_ACCESS_KEY: str = os.getenv("CLOUDFLARE_R2_SECRET_ACCESS_KEY", "")
+    CLOUDFLARE_R2_PUBLIC_DOMAIN: str = os.getenv("CLOUDFLARE_R2_PUBLIC_DOMAIN", "")
+    STORAGE_ENDPOINT_URL: Optional[str] = os.getenv("STORAGE_ENDPOINT_URL", None)
     
     # CORS Origins
     BACKEND_CORS_ORIGINS: List[str] = [
@@ -48,11 +81,6 @@ class Settings(BaseSettings):
     PLATFORM_COMMISSION_PERCENT: float = 5.20  # Default fallback 5.20% (Services/Distributor)
     TDS_SECTION_194O_PERCENT: float = 1.0     # 1.0% mandatory TDS on e-commerce operators (Section 194-O)
     DEFAULT_GST_RATE_PERCENT: float = 18.0   # Default GST slab
-
-    # Listing Rules (Section 13)
-    MINIMUM_LISTING_IMAGES: int = 4
-    MAXIMUM_LISTING_IMAGES: int = 10
-    MAXIMUM_LISTING_VIDEOS: int = 2
 
     # Authentication & OTP Mode (MSG91 SMS Gateway Integration)
     DEV_MODE_OTP: bool = os.getenv(
