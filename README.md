@@ -2,7 +2,7 @@
 
 <div align="center">
 
-![Noryvanta Logo](frontend/public/noryvanta-logo.png)
+![Noryvanta Logo](NRY-Web-App/public/noryvanta-logo.png)
 
 **Connect, Supply, Empower** • **Connect, Grow, Thrive**
 
@@ -14,8 +14,8 @@
 [![React](https://img.shields.io/badge/React-19.0-61DAFB.svg?logo=react&logoColor=black)](https://react.dev)
 [![TypeScript](https://img.shields.io/badge/TypeScript-5.6-3178C6.svg?logo=typescript&logoColor=white)](https://www.typescriptlang.org)
 [![SQLAlchemy](https://img.shields.io/badge/SQLAlchemy-2.0_Async-D71F00.svg?logo=sqlalchemy&logoColor=white)](https://www.sqlalchemy.org)
-[![Alembic](https://img.shields.io/badge/Alembic-Migrations_001--010-8A2BE2.svg)](backend/alembic/)
-[![Tests](https://img.shields.io/badge/Pytest-111%20Passed-success.svg)](backend/tests/)
+[![Alembic](https://img.shields.io/badge/Alembic-Migrations_001--010-8A2BE2.svg)](NRY-Backend/alembic/)
+[![Tests](https://img.shields.io/badge/Pytest-111%20Passed-success.svg)](NRY-Backend/tests/)
 
 </div>
 
@@ -69,40 +69,12 @@ graph TD
 ## 📂 Project Structure
 
 ```
-Noryvanta/
+NORYVANTA/
 │
-├── frontend/                         # Noryvanta Business Web Application (Next.js 15 / React 19)
-│   ├── src/
-│   │   ├── app/                      # 18+ App Router pages (admin, checkout, dashboard, products, vendor, rank-tracker)
-│   │   ├── components/               # Modular UI components (Navbar, Footer, Modals)
-│   │   ├── layouts/                  # MainLayout and DashboardLayout
-│   │   ├── hooks/                    # useAuth, useBusiness, useProducts
-│   │   ├── services/                 # Centralized Backend API Client Services
-│   │   │   ├── apiClient.ts          # Central Axios HTTP client with JWT interceptors
-│   │   │   ├── authApi.ts            # Authentication, OTP, Google login
-│   │   │   ├── businessApi.ts        # Business registration, dashboard, settlements
-│   │   │   ├── productApi.ts         # Product catalog, media validation, AI assist
-│   │   │   ├── serviceApi.ts         # Services marketplace, bookings
-│   │   │   ├── orderApi.ts           # Orders, invoices, financial breakdown
-│   │   │   ├── paymentApi.ts         # Razorpay & Cashfree payment sessions
-│   │   │   ├── uaidApi.ts            # UAID retrieval and resolution
-│   │   │   └── rewardApi.ts          # Referral ledger, reward wallet
-│   │   ├── types/                    # Shared TypeScript interfaces
-│   │   ├── utils/                    # Currency formatters, media validators, fee schedules
-│   │   └── styles/                   # Design system tokens & Tailwind CSS
-│   ├── public/                       # Static public assets
-│   ├── tests/                        # Frontend contract & utility tests
-│   ├── package.json                  # Dependencies
-│   ├── tsconfig.json                 # TypeScript compiler configuration
-│   ├── .env.example                  # Non-secret public configuration template
-│   └── README.md                     # Frontend architecture documentation
-│
-├── backend/                          # Shared Backend REST API Server (FastAPI / SQLAlchemy 2.0 Async)
-│   ├── app/
+├── NRY-Backend/                      # Shared Backend REST API Server (FastAPI / SQLAlchemy 2.0 Async)
+│   ├── app/                          # FastAPI server application
 │   │   ├── main.py                   # FastAPI server entrypoint & Prometheus /metrics
 │   │   ├── api/                      # Versioned REST APIs (/api/v1)
-│   │   │   ├── deps.py               # Dependency injection (get_current_user, get_current_admin)
-│   │   │   └── v1/                   # auth, businesses, products, services, customers, orders, payments, uaid, referrals, rewards, admin
 │   │   ├── core/                     # config.py, database.py, security.py, permissions.py
 │   │   ├── models/                   # Declarative SQLAlchemy ORM models
 │   │   ├── schemas/                  # Pydantic v2 validation schemas
@@ -113,7 +85,7 @@ Noryvanta/
 │   │   ├── integrations/             # payments, notifications, storage, identity
 │   │   ├── tasks/                    # Celery asynchronous task definitions
 │   │   └── utils/                    # Formatting and normalization helpers
-│   ├── alembic/                      # Database migrations (001 to 010)
+│   ├── alembic/                      # Database migrations (001 to 012)
 │   ├── tests/                        # Pytest asynchronous test suite (111 passing tests)
 │   ├── docs/                         # Exhaustive architectural blueprints & specifications
 │   ├── scripts/                      # Database utilities and seed scripts
@@ -122,6 +94,37 @@ Noryvanta/
 │   ├── .env                          # Local private configuration
 │   ├── .env.example                  # Validated environment configuration template
 │   └── README.md                     # Backend API & Mobile contract documentation
+│
+├── NRY-Web-App/                      # Noryvanta Business Web Application (Next.js 15 / React 19)
+│   ├── src/
+│   │   ├── app/                      # 18+ App Router pages (admin, checkout, dashboard, products, vendor, rank-tracker)
+│   │   ├── components/               # Modular UI components (Navbar, Footer, Modals)
+│   │   ├── layouts/                  # MainLayout and DashboardLayout
+│   │   ├── hooks/                    # useAuth, useBusiness, useProducts
+│   │   ├── services/                 # Centralized Backend API Client Services
+│   │   ├── types/                    # Shared TypeScript interfaces
+│   │   ├── utils/                    # Currency formatters, media validators, fee schedules
+│   │   └── styles/                   # Design system tokens & Tailwind CSS
+│   ├── public/                       # Static public assets
+│   ├── tests/                        # Frontend contract & utility tests
+│   ├── package.json                  # Dependencies
+│   ├── tsconfig.json                 # TypeScript compiler configuration
+│   ├── .env.example                  # Non-secret public configuration template
+│   └── README.md                     # Frontend architecture documentation
+│
+├── NRY-Mobile-App/                   # Noryvanta Customer Mobile Application (React 18 / Vite)
+│   ├── src/
+│   │   ├── screens/                  # 26 Customer screens (Marketplace, Rewards, Orders, UAID, Cycles)
+│   │   ├── components/               # TopBar, BottomNav
+│   │   ├── context/                  # AppContext (global auth, cart, screen navigation state)
+│   │   ├── services/                 # api.ts (backend client & mobile mocks)
+│   │   ├── types/                    # TypeScript interfaces
+│   │   └── index.css                 # Cyber-luxe mobile design system
+│   ├── public/                       # Favicon & mobile brand assets
+│   ├── index.html                    # Mobile web PWA viewport & metadata
+│   ├── vite.config.ts                # Vite config with backend proxy (:3001 -> :8000)
+│   ├── package.json                  # Dependencies
+│   └── README.md                     # Customer Mobile App architecture guide
 │
 ├── infra/                            # Multi-container infrastructure configurations (Nginx, Prometheus, Grafana, Postgres)
 ├── docker-compose.yml                # Multi-container orchestration stack
