@@ -41,20 +41,35 @@ export default function BusinessLoginPage() {
   const [loading, setLoading] = useState(false);
   const [message, setMessage] = useState<{ type: "success" | "error"; text: string } | null>(null);
 
-  const handleSendOtp = (e: React.FormEvent) => {
+  const handleSendOtp = async (e: React.FormEvent) => {
     e.preventDefault();
-    if (!mobile.trim()) {
-      setMessage({ type: "error", text: "Please enter your registered mobile number." });
+    const cleanPhone = mobile.trim().replace(/[^\d+]/g, "");
+    if (!cleanPhone || cleanPhone.length < 10) {
+      setMessage({ type: "error", text: "Please enter your valid registered mobile number." });
       return;
     }
     setLoading(true);
-    setTimeout(() => {
-      setLoading(false);
+    setMessage(null);
+    try {
+      const res = await api.post("/auth/otp/request", {
+        identifier: cleanPhone,
+        channel: "SMS"
+      });
       setOtpSent(true);
-      setDevOtp("123456");
-      setOtpCode("123456");
-      setMessage({ type: "success", text: "Verification code dispatched via SMS. Use dev code: 123456" });
-    }, 600);
+      if (res.data?.dev_otp_preview) {
+        setDevOtp(res.data.dev_otp_preview);
+      } else {
+        setDevOtp(null);
+      }
+      setMessage({ type: "success", text: res.data?.message || "Verification code dispatched via SMS." });
+    } catch (err: any) {
+      setMessage({
+        type: "error",
+        text: err.response?.data?.detail || "Failed to dispatch verification code. Please check your mobile number and retry."
+      });
+    } finally {
+      setLoading(false);
+    }
   };
 
   const handleVerifyOtp = async (e: React.FormEvent) => {

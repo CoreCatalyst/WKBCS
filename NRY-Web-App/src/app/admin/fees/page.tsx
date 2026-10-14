@@ -43,18 +43,8 @@ export default function AdminFeesPage() {
       try {
         const res = await api.get("/admin/fees/summary");
         setSummary(res.data);
-      } catch {
-        // Fallback default mock
-        setSummary({
-          currency: "INR",
-          total_gmv: 24850000.0,
-          platform_commission_earned: 745500.0,
-          tds_collected_section_194o: 248500.0,
-          active_funds_in_escrow: 4210000.0,
-          pending_disbursements_count: 14,
-          settled_orders_count: 128,
-          compliance_status: "100% GST & TDS Compliant"
-        });
+      } catch (err) {
+        console.error("Failed to load admin fee summary:", err);
       } finally {
         setLoading(false);
       }

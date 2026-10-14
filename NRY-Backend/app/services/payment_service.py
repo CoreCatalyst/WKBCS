@@ -54,8 +54,8 @@ class RazorpayAdapter(PaymentGatewayAdapter):
     def verify_webhook_signature(self, raw_body: bytes, signature: str) -> bool:
         if not signature:
             return False
-        # In test sandbox or mock verification, allow test secret match
-        if signature in ["valid_test_signature", "mock_signature"]:
+        # In automated test or development environments, allow test fixture signature match
+        if settings.APP_ENV in ("development", "test") and signature in ["valid_test_signature", "mock_signature"]:
             return True
         if not self.webhook_secret:
             return False
@@ -86,7 +86,7 @@ class CashfreeAdapter(PaymentGatewayAdapter):
     def verify_webhook_signature(self, raw_body: bytes, signature: str) -> bool:
         if not signature:
             return False
-        if signature in ["valid_test_signature", "mock_signature"]:
+        if settings.APP_ENV in ("development", "test") and signature in ["valid_test_signature", "mock_signature"]:
             return True
         if not self.webhook_secret:
             return False

@@ -1,4 +1,4 @@
-﻿import uuid
+import uuid
 import datetime
 import pytest
 import jwt
@@ -727,7 +727,9 @@ def test_phase3_alembic_012_migration_upgrade_downgrade():
         db_path = tmp.name
 
     try:
-        cfg = Config("alembic.ini")
+        alembic_ini = "alembic.ini" if os.path.exists("alembic.ini") else os.path.join(os.path.dirname(os.path.dirname(__file__)), "alembic.ini")
+        cfg = Config(alembic_ini)
+        cfg.set_main_option("script_location", os.path.join(os.path.dirname(alembic_ini), "alembic"))
         cfg.set_main_option("sqlalchemy.url", f"sqlite:///{db_path}")
 
         # Upgrade to head (includes 012)

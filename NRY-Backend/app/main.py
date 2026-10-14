@@ -1,4 +1,4 @@
-﻿from contextlib import asynccontextmanager
+from contextlib import asynccontextmanager
 from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
 from app.core.config import settings
@@ -386,8 +386,9 @@ async def seed_initial_demo_data():
 async def lifespan(app: FastAPI):
     # Initialize database tables
     await init_db()
-    # Seed initial demo data
-    await seed_initial_demo_data()
+    # Seed initial demo data ONLY in local development when explicitly requested
+    if settings.APP_ENV == "development" and settings.SEED_DEMO_DATA:
+        await seed_initial_demo_data()
     yield
 
 app = FastAPI(

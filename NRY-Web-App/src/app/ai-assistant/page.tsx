@@ -145,13 +145,12 @@ export default function AIListingAssistantPage() {
       const res = await api.post("/products", payload);
       setPublishSuccess(res.data.id || "published");
     } catch (err: unknown) {
-      const errorObj = err as { response?: { data?: { detail?: string } } };
-      if (errorObj.response?.data?.detail) {
-        setErrorMessage(errorObj.response.data.detail);
-      } else {
-        // Mock fallback for demo
-        setPublishSuccess("demo_pub_" + Date.now());
-      }
+      const errorObj = err as { response?: { data?: { detail?: string } }; message?: string };
+      setErrorMessage(
+        errorObj.response?.data?.detail ||
+        errorObj.message ||
+        "Failed to publish commercial listing. Please verify your business profile and try again."
+      );
     } finally {
       setIsPublishing(false);
     }

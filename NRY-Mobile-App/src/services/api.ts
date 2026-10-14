@@ -131,120 +131,147 @@ const MOCK_SERVICES: ProductItem[] = [
 export const apiClient = {
   // Auth
   async requestOtp(phone_or_email: string, channel = 'sms') {
-    try {
-      const res = await fetch(`${API_BASE}/auth/request-otp`, {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ phone_or_email, channel })
-      });
-      if (res.ok) return await res.json();
-    } catch {}
-    return { success: true, message: `OTP sent via ${channel}`, dev_otp_preview: '123456' };
+    const res = await fetch(`${API_BASE}/auth/request-otp`, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ phone_or_email, channel })
+    });
+    if (!res.ok) {
+      const err = await res.json().catch(() => ({ detail: 'Failed to request OTP' }));
+      throw new Error(err.detail || 'Failed to dispatch verification OTP');
+    }
+    return await res.json();
   },
 
   async verifyOtp(phone_or_email: string, otp_code: string, referral_code?: string) {
-    try {
-      const res = await fetch(`${API_BASE}/auth/verify-otp`, {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ phone_or_email, otp_code, referral_code })
-      });
-      if (res.ok) return await res.json();
-    } catch {}
-    return {
-      access_token: 'mock-jwt-token-customer',
-      refresh_token: 'mock-refresh-token',
-      user_id: 'usr-demo-customer-1',
-      full_name: 'Aditi Deshmukh',
-      uaid: 'NRY-C-7K4M9X2P8Q',
-      phone: phone_or_email,
-      role: 'CUSTOMER',
-      has_referral: true,
-      is_reward_eligible: true
-    };
+    const res = await fetch(`${API_BASE}/auth/verify-otp`, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ phone_or_email, otp_code, referral_code })
+    });
+    if (!res.ok) {
+      const err = await res.json().catch(() => ({ detail: 'Invalid verification code' }));
+      throw new Error(err.detail || 'OTP verification failed');
+    }
+    const data = await res.json();
+    if (data.access_token) {
+      localStorage.setItem('token', data.access_token);
+      localStorage.setItem('user', JSON.stringify(data));
+    }
+    return data;
+  },
+
+  async loginWithPassword(identifier: string, password: string) {
+    const res = await fetch(`${API_BASE}/auth/login`, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ identifier, password })
+    });
+    if (!res.ok) {
+      const err = await res.json().catch(() => ({ detail: 'Invalid credentials' }));
+      throw new Error(err.detail || 'Authentication failed');
+    }
+    const data = await res.json();
+    if (data.access_token) {
+      localStorage.setItem('token', data.access_token);
+      localStorage.setItem('user', JSON.stringify(data));
+    }
+    return data;
+  },
+
+  async register(payload: { full_name: string; phone?: string; email?: string; password?: string; referral_code?: string }) {
+    const res = await fetch(`${API_BASE}/auth/register`, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify(payload)
+    });
+    if (!res.ok) {
+      const err = await res.json().catch(() => ({ detail: 'Registration failed' }));
+      throw new Error(err.detail || 'Customer registration failed');
+    }
+    const data = await res.json();
+    if (data.access_token) {
+      localStorage.setItem('token', data.access_token);
+      localStorage.setItem('user', JSON.stringify(data));
+    }
+    return data;
   },
 
   // Profile & UAID
   async getProfile(): Promise<CustomerUser> {
-    try {
-      const res = await fetch(`${API_BASE}/profile`, {
-        headers: { Authorization: `Bearer ${localStorage.getItem('token') || ''}` }
-      });
-      if (res.ok) return await res.json();
-    } catch {}
-    return MOCK_USER;
+    const res = await fetch(`${API_BASE}/profile`, {
+      headers: {
+        'Content-Type': 'application/json',
+        Authorization: `Bearer ${localStorage.getItem('token') || ''}`
+      }
+    });
+    if (!res.ok) {
+      throw new Error('Unable to retrieve profile.');
+    }
+    return await res.json();
   },
 
   async getUaid() {
-    try {
-      const res = await fetch(`${API_BASE}/uaid`, {
-        headers: { Authorization: `Bearer ${localStorage.getItem('token') || ''}` }
-      });
-      if (res.ok) return await res.json();
-    } catch {}
-    return {
-      uaid: 'NRY-C-7K4M9X2P8Q',
-      user_id: 'usr-demo-customer-1',
-      qr_payload: 'NRY_CUSTOMER:NRY-C-7K4M9X2P8Q',
-      share_url: 'https://noryvantaglobal.com/c/join?ref=NRY-C-7K4M9X2P8Q'
-    };
+    const res = await fetch(`${API_BASE}/uaid`, {
+      headers: {
+        'Content-Type': 'application/json',
+        Authorization: `Bearer ${localStorage.getItem('token') || ''}`
+      }
+    });
+    if (!res.ok) {
+      throw new Error('Unable to fetch UAID details.');
+    }
+    return await res.json();
   },
 
   // Referrals
   async validateReferral(code: string) {
-    try {
-      const res = await fetch(`${API_BASE}/referrals/validate`, {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-          Authorization: `Bearer ${localStorage.getItem('token') || ''}`
-        },
-        body: JSON.stringify({ referral_code: code })
-      });
-      if (res.ok) return await res.json();
-    } catch {}
-    if (code.toUpperCase().startsWith('NRY-C-')) {
-      return { valid: true, referrer_uaid: code.toUpperCase(), message: 'Valid Customer Referral' };
+    const res = await fetch(`${API_BASE}/referrals/validate`, {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+        Authorization: `Bearer ${localStorage.getItem('token') || ''}`
+      },
+      body: JSON.stringify({ referral_code: code })
+    });
+    if (!res.ok) {
+      const err = await res.json().catch(() => ({ detail: 'Invalid referral code' }));
+      return { valid: false, message: err.detail || 'Invalid referral code' };
     }
-    return { valid: false, message: 'Invalid format. Customer referrals must start with NRY-C-' };
+    return await res.json();
   },
 
   async applyReferral(code: string) {
-    try {
-      const res = await fetch(`${API_BASE}/referrals/apply`, {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-          Authorization: `Bearer ${localStorage.getItem('token') || ''}`
-        },
-        body: JSON.stringify({ referral_code: code })
-      });
-      if (res.ok) return await res.json();
-    } catch {}
-    return { valid: true, message: `Referral ${code} applied successfully.` };
+    const res = await fetch(`${API_BASE}/referrals/apply`, {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+        Authorization: `Bearer ${localStorage.getItem('token') || ''}`
+      },
+      body: JSON.stringify({ referral_code: code })
+    });
+    if (!res.ok) {
+      const err = await res.json().catch(() => ({ detail: 'Failed to apply referral' }));
+      throw new Error(err.detail || 'Failed to bind referral');
+    }
+    return await res.json();
   },
 
   // Marketplace
   async getProducts(): Promise<ProductItem[]> {
-    try {
-      const res = await fetch(`${API_BASE}/marketplace/products`);
-      if (res.ok) {
-        const data = await res.json();
-        if (data && data.length) return data;
-      }
-    } catch {}
-    return MOCK_PRODUCTS;
+    const res = await fetch(`${API_BASE}/marketplace/products`);
+    if (!res.ok) {
+      throw new Error('Failed to load marketplace products.');
+    }
+    return await res.json();
   },
 
   async getServices(): Promise<ProductItem[]> {
-    try {
-      const res = await fetch(`${API_BASE}/marketplace/services`);
-      if (res.ok) {
-        const data = await res.json();
-        if (data && data.length) return data;
-      }
-    } catch {}
-    return MOCK_SERVICES;
+    const res = await fetch(`${API_BASE}/marketplace/services`);
+    if (!res.ok) {
+      throw new Error('Failed to load marketplace services.');
+    }
+    return await res.json();
   },
 
   // Rewards Status & Ranks

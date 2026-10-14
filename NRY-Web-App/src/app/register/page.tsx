@@ -1,4 +1,4 @@
-﻿"use client";
+"use client";
 
 import React, { useState } from "react";
 import { useRouter } from "next/navigation";
@@ -143,23 +143,52 @@ export default function BusinessRegistrationPage() {
   const [agreeFeePolicy, setAgreeFeePolicy] = useState(false);
   const [errorMsg, setErrorMsg] = useState("");
 
-  // OTP handlers
-  const handleSendOtp = () => {
-    if (!accountData.mobile) {
-      setErrorMsg("Please enter a valid mobile number");
+  // Real OTP handlers connected to FastAPI backend
+  const handleSendOtp = async () => {
+    if (!accountData.mobile || accountData.mobile.trim().length < 10) {
+      setErrorMsg("Please enter a valid 10-digit mobile number.");
       return;
     }
     setErrorMsg("");
-    setAccountData(prev => ({ ...prev, isOtpSent: true }));
-    setMockDevOtp("884210");
+    try {
+      const cleanPhone = accountData.mobile.replace(/[^\d+]/g, "");
+      const res = await api.post("/auth/otp/request", {
+        identifier: cleanPhone,
+        channel: "SMS"
+      });
+      setAccountData(prev => ({ ...prev, isOtpSent: true }));
+      if (res.data?.dev_otp_preview) {
+        setMockDevOtp(res.data.dev_otp_preview);
+      } else {
+        setMockDevOtp(null);
+      }
+    } catch (err: any) {
+      setErrorMsg(err.response?.data?.detail || "Failed to dispatch verification code. Please check your mobile number and retry.");
+    }
   };
 
-  const handleVerifyOtp = () => {
-    if (accountData.otp === "884210" || accountData.otp.length === 6) {
+  const handleVerifyOtp = async () => {
+    if (!accountData.otp || accountData.otp.trim().length < 6) {
+      setErrorMsg("Please enter the complete 6-digit OTP code received.");
+      return;
+    }
+    setErrorMsg("");
+    try {
+      const cleanPhone = accountData.mobile.replace(/[^\d+]/g, "");
+      const authRes = await api.post("/auth/otp/verify", {
+        identifier: cleanPhone,
+        otp_code: accountData.otp.trim(),
+        full_name: businessData.ownerName || "Business Owner",
+        role: "BUSINESS_OWNER"
+      });
+      if (authRes.data?.access_token) {
+        tokenStore.setToken(authRes.data.access_token);
+        localStorage.setItem("noryvanta_user", JSON.stringify(authRes.data));
+      }
       setAccountData(prev => ({ ...prev, isOtpVerified: true }));
       setErrorMsg("");
-    } else {
-      setErrorMsg("Invalid OTP. For demonstration, use 884210.");
+    } catch (err: any) {
+      setErrorMsg(err.response?.data?.detail || "Invalid or expired OTP code. Please check and retry.");
     }
   };
 
@@ -250,21 +279,12 @@ export default function BusinessRegistrationPage() {
     setErrorMsg("");
 
     try {
-      // 1. Authenticate user session with OTP service
-      let token = tokenStore.getToken();
+      // 1. Verify user session is authenticated
+      const token = tokenStore.getToken();
       if (!token) {
-        const cleanPhone = accountData.mobile.replace(/[^\d+]/g, "") || "+919876543210";
-        const authRes = await api.post("/auth/otp/verify", {
-          identifier: cleanPhone,
-          otp_code: "123456",
-          full_name: businessData.ownerName || "Business Owner",
-          role: "BUSINESS_OWNER"
-        });
-        if (authRes.data?.access_token) {
-          token = authRes.data.access_token;
-          tokenStore.setToken(token);
-          localStorage.setItem("noryvanta_user", JSON.stringify(authRes.data));
-        }
+        setErrorMsg("Your mobile number must be verified via OTP in Step 1 before completing registration.");
+        setLoading(false);
+        return;
       }
 
       // 2. Determine classification for service vs product businesses

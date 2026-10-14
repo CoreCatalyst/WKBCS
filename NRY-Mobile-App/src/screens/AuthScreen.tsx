@@ -44,17 +44,11 @@ export const AuthScreen: React.FC = () => {
     setError('');
     setLoading(true);
     try {
-      // Direct mock/demo login
-      const profile = await apiClient.getProfile();
-      setUser({
-        ...profile,
-        full_name: fullName || profile.full_name,
-        email: identifier.includes('@') ? identifier : profile.email,
-        phone: !identifier.includes('@') ? identifier : profile.phone
-      });
+      const authData = await apiClient.loginWithPassword(identifier.trim(), password);
+      setUser(authData);
       setScreen('products');
     } catch (e: any) {
-      setError(e.message || 'Authentication failed.');
+      setError(e.message || 'Authentication failed. Please verify credentials.');
     } finally {
       setLoading(false);
     }

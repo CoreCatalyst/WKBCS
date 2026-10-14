@@ -1,4 +1,4 @@
-﻿import os
+import os
 from typing import List, Optional
 from pydantic import model_validator
 from pydantic_settings import BaseSettings, SettingsConfigDict
@@ -55,7 +55,10 @@ class Settings(BaseSettings):
     MAXIMUM_LISTING_VIDEOS: int = 2
 
     # Authentication & OTP Mode (MSG91 SMS Gateway Integration)
-    DEV_MODE_OTP: bool = os.getenv("DEV_MODE_OTP", "true").lower() in ("true", "1", "yes")
+    DEV_MODE_OTP: bool = os.getenv(
+        "DEV_MODE_OTP",
+        "false" if os.getenv("APP_ENV", "").lower() == "production" else "true"
+    ).lower() in ("true", "1", "yes")
     SMS_PROVIDER: str = os.getenv("SMS_PROVIDER", "msg91")  # "msg91" | "mock"
     MSG91_AUTH_KEY: str = os.getenv("MSG91_AUTH_KEY", "")
     MSG91_SENDER_ID: str = os.getenv("MSG91_SENDER_ID", "NORYVT")
@@ -66,27 +69,30 @@ class Settings(BaseSettings):
     OTP_MAX_ATTEMPTS: int = int(os.getenv("OTP_MAX_ATTEMPTS", "3"))
     OTP_RATE_LIMIT_SECONDS: int = int(os.getenv("OTP_RATE_LIMIT_SECONDS", "60"))
 
-    # Payment Gateway: Razorpay (Sandbox / Test keys in development)
-    RAZORPAY_KEY_ID: str = os.getenv("RAZORPAY_KEY_ID", "rzp_test_noryvanta_sandbox")
-    RAZORPAY_KEY_SECRET: str = os.getenv("RAZORPAY_KEY_SECRET", "mock_razorpay_secret_key")
-    RAZORPAY_WEBHOOK_SECRET: str = os.getenv("RAZORPAY_WEBHOOK_SECRET", "mock_razorpay_webhook_secret")
+    # Seed Data Flag (strictly disabled in production)
+    SEED_DEMO_DATA: bool = os.getenv("SEED_DEMO_DATA", "false").lower() in ("true", "1", "yes")
 
-    # Payment Gateway: Cashfree (Sandbox / Test keys in development)
-    CASHFREE_APP_ID: str = os.getenv("CASHFREE_APP_ID", os.getenv("CASHFREE_CLIENT_ID", "cf_test_noryvanta_sandbox"))
-    CASHFREE_CLIENT_ID: str = os.getenv("CASHFREE_CLIENT_ID", "cf_test_noryvanta_sandbox")
-    CASHFREE_SECRET_KEY: str = os.getenv("CASHFREE_SECRET_KEY", os.getenv("CASHFREE_CLIENT_SECRET", "mock_cashfree_secret_key"))
-    CASHFREE_CLIENT_SECRET: str = os.getenv("CASHFREE_CLIENT_SECRET", "mock_cashfree_secret_key")
-    CASHFREE_WEBHOOK_SECRET: str = os.getenv("CASHFREE_WEBHOOK_SECRET", "mock_cashfree_webhook_secret")
+    # Payment Gateway: Razorpay
+    RAZORPAY_KEY_ID: str = os.getenv("RAZORPAY_KEY_ID", "")
+    RAZORPAY_KEY_SECRET: str = os.getenv("RAZORPAY_KEY_SECRET", "")
+    RAZORPAY_WEBHOOK_SECRET: str = os.getenv("RAZORPAY_WEBHOOK_SECRET", "")
+
+    # Payment Gateway: Cashfree
+    CASHFREE_APP_ID: str = os.getenv("CASHFREE_APP_ID", os.getenv("CASHFREE_CLIENT_ID", ""))
+    CASHFREE_CLIENT_ID: str = os.getenv("CASHFREE_CLIENT_ID", "")
+    CASHFREE_SECRET_KEY: str = os.getenv("CASHFREE_SECRET_KEY", os.getenv("CASHFREE_CLIENT_SECRET", ""))
+    CASHFREE_CLIENT_SECRET: str = os.getenv("CASHFREE_CLIENT_SECRET", "")
+    CASHFREE_WEBHOOK_SECRET: str = os.getenv("CASHFREE_WEBHOOK_SECRET", "")
 
     # AI Listing Assistant Provider (Gemini / OpenAI abstraction)
-    AI_PROVIDER: str = os.getenv("AI_PROVIDER", "gemini")  # "gemini" | "openai" | "mock"
+    AI_PROVIDER: str = os.getenv("AI_PROVIDER", "gemini")  # "gemini" | "openai"
     AI_API_KEY: str = os.getenv("AI_API_KEY", "")
     GEMINI_API_KEY: str = os.getenv("GEMINI_API_KEY", os.getenv("AI_API_KEY", ""))
     OPENAI_API_KEY: str = os.getenv("OPENAI_API_KEY", "")
 
     # Email Provider (Resend API)
     RESEND_API_KEY: str = os.getenv("RESEND_API_KEY", "")
-    EMAIL_FROM: str = os.getenv("EMAIL_FROM", "Noryvanta <notifications@noryvantaglobal.com>")
+    EMAIL_FROM: str = os.getenv("EMAIL_FROM", "Noryvanta Global <support@noryvantaglobal.com>")
 
     # Social Login (Google OAuth)
     GOOGLE_CLIENT_ID: str = os.getenv("GOOGLE_CLIENT_ID", "")
@@ -114,7 +120,7 @@ class Settings(BaseSettings):
     @property
     def is_dev_otp_allowed(self) -> bool:
         """Development OTP mode is strictly forbidden in production."""
-        return self.APP_ENV == "development" and self.DEV_MODE_OTP
+        return self.APP_ENV in ("development", "test") and self.DEV_MODE_OTP
 
     @model_validator(mode="after")
     def validate_production_security(self) -> "Settings":

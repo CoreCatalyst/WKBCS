@@ -5,7 +5,7 @@ import { useApp } from '../context/AppContext';
 export const CheckoutScreen: React.FC = () => {
   const { cart, clearCart, setScreen, refreshData, rewardStatus } = useApp();
   const [recipientName, setRecipientName] = useState('Aditi Deshmukh');
-  const [phone, setPhone] = useState('+91 98765 43210');
+  const [phone, setPhone] = useState('+91 7507897697');
   const [addressLine, setAddressLine] = useState('Flat 402, Green Valley Apartments, Kothrud');
   const [city, setCity] = useState('Pune');
   const [postalCode, setPostalCode] = useState('411038');
@@ -49,7 +49,10 @@ export const CheckoutScreen: React.FC = () => {
 
       const res = await fetch('/api/v1/customer/cart/checkout', {
         method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
+        headers: {
+          'Content-Type': 'application/json',
+          Authorization: `Bearer ${localStorage.getItem('token') || ''}`
+        },
         body: JSON.stringify(orderPayload)
       });
 
