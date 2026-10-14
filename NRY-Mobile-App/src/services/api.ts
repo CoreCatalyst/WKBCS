@@ -6,8 +6,8 @@ const API_BASE = '/api/v1/customer';
 const MOCK_USER: CustomerUser = {
   id: 'usr-demo-customer-1',
   full_name: 'Aditi Deshmukh',
-  email: 'aditi.customer@noryvanta.in',
-  phone: '+91 98765 43210',
+  email: 'aditi.customer@noryvantaglobal.com',
+  phone: '+91 7507897697',
   uaid: 'NRY-C-7K4M9X2P8Q',
   role: 'CUSTOMER',
   has_referral: true,
@@ -186,7 +186,7 @@ export const apiClient = {
       uaid: 'NRY-C-7K4M9X2P8Q',
       user_id: 'usr-demo-customer-1',
       qr_payload: 'NRY_CUSTOMER:NRY-C-7K4M9X2P8Q',
-      share_url: 'https://noryvanta.in/c/join?ref=NRY-C-7K4M9X2P8Q'
+      share_url: 'https://noryvantaglobal.com/c/join?ref=NRY-C-7K4M9X2P8Q'
     };
   },
 

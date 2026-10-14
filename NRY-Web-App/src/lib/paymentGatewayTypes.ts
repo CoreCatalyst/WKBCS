@@ -1,4 +1,4 @@
-export type PaymentGatewayId = "razorpay" | "cashfree";
+﻿export type PaymentGatewayId = "razorpay" | "cashfree";
 
 export type PaymentStatus =
   | "Initiated"
@@ -62,7 +62,7 @@ export const INITIAL_GATEWAYS: GatewayConfig[] = [
     mode: "Test",
     apiKey: "rzp_test_NoryvantaMarketplace99",
     secretKeyMasked: "••••••••••••••••••••••••",
-    webhookUrl: "https://api.noryvanta.in/v1/payments/webhooks/razorpay",
+    webhookUrl: "https://api.noryvantaglobal.com/v1/payments/webhooks/razorpay",
     supportedCurrencies: ["INR", "USD", "GBP", "EUR", "AED", "SGD"],
     supportedMethods: ["UPI", "CARD", "NET_BANKING", "WALLETS", "EMI"]
   },
@@ -74,7 +74,7 @@ export const INITIAL_GATEWAYS: GatewayConfig[] = [
     mode: "Test",
     apiKey: "cf_app_NoryvantaEscrowDirect",
     secretKeyMasked: "••••••••••••••••••••••••",
-    webhookUrl: "https://api.noryvanta.in/v1/payments/webhooks/cashfree",
+    webhookUrl: "https://api.noryvantaglobal.com/v1/payments/webhooks/cashfree",
     supportedCurrencies: ["INR", "USD", "AED"],
     supportedMethods: ["UPI", "CARD", "NET_BANKING", "WALLETS", "PAY_LATER", "COD"]
   }

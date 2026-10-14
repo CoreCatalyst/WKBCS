@@ -1,4 +1,4 @@
-import hmac
+﻿import hmac
 import hashlib
 import base64
 import json
@@ -23,7 +23,7 @@ class QRService:
         payload = {
             "uaid": uaid,
             "ts": int(time.time()),
-            "iss": "noryvanta.in"
+            "iss": "noryvantaglobal.com"
         }
         encoded_payload = base64.urlsafe_b64encode(json.dumps(payload).encode()).decode().rstrip("=")
         signature = hmac.new(

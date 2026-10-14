@@ -1,4 +1,4 @@
-import pytest
+﻿import pytest
 from httpx import AsyncClient, ASGITransport
 from app.main import app
 
@@ -212,7 +212,7 @@ async def test_product_media_image_limits():
     async with AsyncClient(transport=ASGITransport(app=app), base_url="http://test") as ac:
         # Login vendor
         user = await ac.post("/api/v1/auth/otp/verify", json={
-            "identifier": "vendor@noryvanta.in",
+            "identifier": "vendor@noryvantaglobal.com",
             "otp_code": "123456"
         })
         token = user.json()["access_token"]

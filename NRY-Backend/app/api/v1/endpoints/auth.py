@@ -1,4 +1,4 @@
-import httpx
+﻿import httpx
 from typing import Optional
 from fastapi import APIRouter, Depends, HTTPException, Request, Response, status
 from sqlalchemy.ext.asyncio import AsyncSession
@@ -352,7 +352,7 @@ async def oauth_login(
         if not is_human:
             raise HTTPException(status_code=status.HTTP_403_FORBIDDEN, detail="Bot verification failed (Turnstile).")
 
-    mock_email = f"enterprise.{payload.provider}@noryvanta.in"
+    mock_email = f"enterprise.{payload.provider}@noryvantaglobal.com"
     user = await AuthService.get_or_create_user_by_identifier(
         db,
         identifier=mock_email,

@@ -1,4 +1,4 @@
-"""
+﻿"""
 Supabase Object Storage Provider for Noryvanta.
 Implements secure signed upload authorization, short-lived download tokens,
 and remote asset lifecycle management.
@@ -55,7 +55,7 @@ class SupabaseStorageProvider(BaseStorageProvider):
 
         if not self.is_configured():
             logger.warning("[Supabase Storage] Live credentials not configured. Returning simulated signed upload URL.")
-            simulated_url = f"https://mock-storage.noryvanta.in/{bucket}/{clean_path}?token=mock_upload_token"
+            simulated_url = f"https://mock-storage.noryvantaglobal.com/{bucket}/{clean_path}?token=mock_upload_token"
             return {
                 "upload_url": simulated_url,
                 "provider": "supabase",
@@ -110,7 +110,7 @@ class SupabaseStorageProvider(BaseStorageProvider):
         """Constructs public URL for public assets."""
         clean_path = path.lstrip("/")
         if not self.is_configured():
-            return f"https://cdn.noryvanta.in/{bucket}/{clean_path}"
+            return f"https://cdn.noryvantaglobal.com/{bucket}/{clean_path}"
         return f"{self.supabase_url}/storage/v1/object/public/{bucket}/{clean_path}"
 
     async def create_signed_download_url(
@@ -122,7 +122,7 @@ class SupabaseStorageProvider(BaseStorageProvider):
         """Creates short-lived read URL for private / sensitive files."""
         clean_path = path.lstrip("/")
         if not self.is_configured():
-            return f"https://mock-storage.noryvanta.in/{bucket}/{clean_path}?token=mock_download_token"
+            return f"https://mock-storage.noryvantaglobal.com/{bucket}/{clean_path}?token=mock_download_token"
 
         endpoint = f"{self.supabase_url}/storage/v1/object/sign/{bucket}/{clean_path}"
         try:

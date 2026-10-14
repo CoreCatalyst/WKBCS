@@ -23,7 +23,9 @@ export const SupportLegalScreen: React.FC = () => {
             <Mail size={16} color="var(--primary)" />
             <span>Customer Desk</span>
           </div>
-          <span style={{ color: 'var(--primary)', fontWeight: 600 }}>support@noryvanta.in</span>
+          <a href="mailto:support@noryvantaglobal.com" style={{ color: 'var(--primary)', fontWeight: 600, textDecoration: 'none' }}>
+            support@noryvantaglobal.com
+          </a>
         </div>
 
         <div className="flex-between" style={{ padding: '8px 0', fontSize: '13px' }}>
@@ -31,7 +33,9 @@ export const SupportLegalScreen: React.FC = () => {
             <Phone size={16} color="var(--accent-emerald)" />
             <span>Direct Line</span>
           </div>
-          <span style={{ color: 'var(--text-main)', fontWeight: 600 }}>1800-NORY-CARE</span>
+          <a href="tel:+917507897697" style={{ color: 'var(--text-main)', fontWeight: 600, textDecoration: 'none' }}>
+            +91 7507897697
+          </a>
         </div>
       </div>
 

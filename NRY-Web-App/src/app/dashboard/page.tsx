@@ -1,4 +1,4 @@
-"use client";
+﻿"use client";
 
 import React, { useState, useEffect, Suspense } from "react";
 import { useSearchParams, useRouter } from "next/navigation";
@@ -1895,7 +1895,7 @@ function DashboardMainContent() {
                     <div>
                       <h3 className="text-base font-bold text-[#113D60]">Listing Preview</h3>
                       <p className="text-xs text-slate-500">
-                        This preview looks exactly like the customer-facing listing on Noryvanta.in.
+                        This preview looks exactly like the customer-facing listing on noryvantaglobal.com.
                       </p>
                     </div>
                     <span className="px-3 py-1 bg-amber-50 border border-amber-200 text-amber-800 text-xs font-bold rounded-lg">

@@ -1,4 +1,4 @@
-# NORYVANTA.IN — BACKEND MASTER ARCHITECTURAL SPECIFICATION & SYSTEM DESIGN
+﻿# NORYVANTAGLOBAL.COM — BACKEND MASTER ARCHITECTURAL SPECIFICATION & SYSTEM DESIGN
 
 **Version:** 1.0.0 (Production Blueprint)  
 **System Identity:** Noryvanta Sovereign Commerce & Digital Network Infrastructure  

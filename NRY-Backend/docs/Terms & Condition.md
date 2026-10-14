@@ -1,8 +1,8 @@
-# Terms and Conditions of Service: Noryvanta Business Marketplace
+﻿# Terms and Conditions of Service: Noryvanta Business Marketplace
 
 **Effective Date**: September 24, 2026  
 **Entity**: Noryvanta Commercial Technologies Private Limited ("Noryvanta", "We", "Us", "Platform")  
-**Platform**: `noryvanta.in` and associated mobile / API endpoints  
+**Platform**: `noryvantaglobal.com` and associated mobile / API endpoints  
 
 ---
 

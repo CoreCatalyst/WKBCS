@@ -1,4 +1,4 @@
-# Noryvanta Business Marketplace: Investor & Executive Presentation Deck
+﻿# Noryvanta Business Marketplace: Investor & Executive Presentation Deck
 
 **Tagline**: *CONNECT. GROW. THRIVE.*  
 **Domain**: B2B Escrow-Powered Commercial Commerce  
@@ -99,6 +99,6 @@
 ---
 
 ## Slide 12: Leadership, Contact & Call to Action
-- **Platform**: `noryvanta.in`
+- **Platform**: `noryvantaglobal.com`
 - **Corporate Mission**: Empowering enterprises with institutional trust, transparent economics, and frictionless commerce.
 - **Next Steps**: Seed / Series A funding round open for institutional FinTech and B2B commerce investors.

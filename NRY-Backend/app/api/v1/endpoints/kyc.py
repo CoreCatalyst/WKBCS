@@ -1,4 +1,4 @@
-from datetime import datetime, timezone
+﻿from datetime import datetime, timezone
 from fastapi import APIRouter, Depends, HTTPException, status
 from sqlalchemy.ext.asyncio import AsyncSession
 from sqlalchemy import select
@@ -93,7 +93,7 @@ async def get_document_signed_url(
     return {
         "document_id": doc.id,
         "expires_in_seconds": 900,
-        "signed_url": f"https://storage.noryvanta.in/secure/kyc/{doc.storage_key}?signature=mock_presigned_exp_900s"
+        "signed_url": f"https://storage.noryvantaglobal.com/secure/kyc/{doc.storage_key}?signature=mock_presigned_exp_900s"
     }
 
 # ─── SEPARATED MODULAR KYC CATEGORIES (RULES 1 - 11) ──────────────────────────

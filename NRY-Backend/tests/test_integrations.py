@@ -1,4 +1,4 @@
-import pytest
+﻿import pytest
 from httpx import AsyncClient, ASGITransport
 from app.main import app
 from app.services.notification_service import NotificationService, MockEmailProvider
@@ -100,7 +100,7 @@ async def test_google_oauth_login_endpoint():
     async with AsyncClient(transport=ASGITransport(app=app), base_url="http://test") as ac:
         res = await ac.post("/api/v1/auth/google", json={
             "id_token": "google_token_mock_test_12345",
-            "email": "google.partner@noryvanta.in",
+            "email": "google.partner@noryvantaglobal.com",
             "full_name": "Google Verified Enterprise Vendor",
             "role": "BUSINESS_OWNER"
         })
@@ -108,7 +108,7 @@ async def test_google_oauth_login_endpoint():
         data = res.json()
         assert "access_token" in data
         assert "refresh_token" in data
-        assert data["email"] == "google.partner@noryvanta.in"
+        assert data["email"] == "google.partner@noryvantaglobal.com"
         assert data["token_type"] == "bearer"
 
 @pytest.mark.asyncio

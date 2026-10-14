@@ -1,4 +1,4 @@
-"""
+﻿"""
 Noryvanta Customer Mobile API Module
 Dedicated endpoints for NRY-Mobile-App frontend.
 Routes: /api/v1/customer/*
@@ -417,7 +417,7 @@ async def get_customer_uaid(
         "user_id": current_user.id,
         "full_name": current_user.full_name,
         "qr_payload": f"NRY_CUSTOMER:{uaid_val}",
-        "share_url": f"https://noryvanta.in/c/join?ref={uaid_val}",
+        "share_url": f"https://noryvantaglobal.com/c/join?ref={uaid_val}",
         "can_copy": True
     }
 
@@ -484,7 +484,7 @@ async def get_my_referral_code(
     return {
         "uaid": uaid_val,
         "referral_code": uaid_val,
-        "share_url": f"https://noryvanta.in/c/join?ref={uaid_val}",
+        "share_url": f"https://noryvantaglobal.com/c/join?ref={uaid_val}",
         "share_message": f"Join Noryvanta using my referral UAID: {uaid_val} to unlock premium marketplace rewards!",
         "qr_payload": f"NRY_REFERRAL:{uaid_val}"
     }

@@ -1,4 +1,4 @@
-# API Specification: Noryvanta Business Marketplace
+﻿# API Specification: Noryvanta Business Marketplace
 
 ## 1. Overview
 The **Noryvanta Business Marketplace API** is a RESTful API specification compliant with **OpenAPI 3.1**. It provides complete interfaces for B2B authentication, business KYC verification, product catalog management, purchase order generation, escrow transaction lifecycle, and administrative governance.
@@ -52,7 +52,7 @@ The **Noryvanta Business Marketplace API** is a RESTful API specification compli
   "user": {
     "id": "usr_99a8b1",
     "phone": "+919876543210",
-    "email": "vendor@noryvanta.in",
+    "email": "vendor@noryvantaglobal.com",
     "role": "vendor",
     "is_verified": true,
     "has_business_profile": true

@@ -1,4 +1,4 @@
-import os
+﻿import os
 from typing import List, Optional
 from pydantic import model_validator
 from pydantic_settings import BaseSettings, SettingsConfigDict
@@ -35,7 +35,7 @@ class Settings(BaseSettings):
         orig.strip()
         for orig in os.getenv(
             "CORS_ALLOWED_ORIGINS",
-            "http://localhost:3000,http://127.0.0.1:3000,http://localhost:8000,https://noryvanta.in,https://www.noryvanta.in"
+            "http://localhost:3000,http://127.0.0.1:3000,http://localhost:8000,https://noryvantaglobal.com,https://www.noryvantaglobal.com"
         ).split(",")
         if orig.strip()
     ]
@@ -86,7 +86,7 @@ class Settings(BaseSettings):
 
     # Email Provider (Resend API)
     RESEND_API_KEY: str = os.getenv("RESEND_API_KEY", "")
-    EMAIL_FROM: str = os.getenv("EMAIL_FROM", "Noryvanta <notifications@noryvanta.in>")
+    EMAIL_FROM: str = os.getenv("EMAIL_FROM", "Noryvanta <notifications@noryvantaglobal.com>")
 
     # Social Login (Google OAuth)
     GOOGLE_CLIENT_ID: str = os.getenv("GOOGLE_CLIENT_ID", "")

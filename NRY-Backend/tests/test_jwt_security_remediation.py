@@ -1,4 +1,4 @@
-import uuid
+﻿import uuid
 import datetime
 import pytest
 import jwt
@@ -75,7 +75,7 @@ async def test_fix1_role_privilege_escalation_prevention():
         assert admin_login.json()["role"] == "ADMIN"
 
         # 6. Authorized admin provisioning endpoint creates valid administrator
-        new_admin_id = f"admin.{uuid.uuid4().hex[:6]}@noryvanta.in"
+        new_admin_id = f"admin.{uuid.uuid4().hex[:6]}@noryvantaglobal.com"
         prov_res = await ac.post(
             "/api/v1/admin/users/provision",
             headers={"Authorization": f"Bearer {admin_token}"},
@@ -257,7 +257,7 @@ async def test_fix5_real_password_authentication():
 
         # 1. Valid password login with seeded vendor (browser endpoint never returns refresh_token in JSON)
         valid_login = await ac.post("/api/v1/auth/login/password", json={
-            "email": "vendor@noryvanta.in",
+            "email": "vendor@noryvantaglobal.com",
             "password": "Password123!",
             "client_type": "mobile"
         })
@@ -271,11 +271,11 @@ async def test_fix5_real_password_authentication():
         # Verify access token works on /me
         me_res = await ac.get("/api/v1/auth/me", headers={"Authorization": f"Bearer {data['access_token']}"})
         assert me_res.status_code == 200
-        assert me_res.json()["email"] == "vendor@noryvanta.in"
+        assert me_res.json()["email"] == "vendor@noryvantaglobal.com"
 
         # 2. Invalid password returns generic 401
         bad_pw_res = await ac.post("/api/v1/auth/login/password", json={
-            "email": "vendor@noryvanta.in",
+            "email": "vendor@noryvantaglobal.com",
             "password": "WrongPassword999!"
         })
         assert bad_pw_res.status_code == 401
@@ -283,7 +283,7 @@ async def test_fix5_real_password_authentication():
 
         # 3. Unknown email returns generic 401
         unknown_res = await ac.post("/api/v1/auth/login/password", json={
-            "email": "nonexistent@noryvanta.in",
+            "email": "nonexistent@noryvantaglobal.com",
             "password": "Password123!"
         })
         assert unknown_res.status_code == 401
@@ -460,7 +460,7 @@ async def test_fix_f02_strict_cookie_csrf_validation():
         res_trusted = await ac.post(
             "/api/v1/auth/refresh",
             json={},
-            headers={"Origin": "https://noryvanta.in"}
+            headers={"Origin": "https://noryvantaglobal.com"}
         )
         assert res_trusted.status_code == 200
 
@@ -486,7 +486,7 @@ async def test_fix_f02_strict_cookie_csrf_validation():
             "/api/v1/auth/refresh",
             json={},
             headers={
-                "Origin": "https://noryvanta.in",
+                "Origin": "https://noryvantaglobal.com",
                 "Referer": "https://malicious-site.com/attack"
             }
         )
@@ -497,7 +497,7 @@ async def test_fix_f02_strict_cookie_csrf_validation():
         res_trusted_ref = await ac.post(
             "/api/v1/auth/refresh",
             json={},
-            headers={"Referer": "https://noryvanta.in/dashboard/account"}
+            headers={"Referer": "https://noryvantaglobal.com/dashboard/account"}
         )
         assert res_trusted_ref.status_code == 200
 
@@ -510,7 +510,7 @@ async def test_fix_f02_strict_cookie_csrf_validation():
         assert res_evil_ref.status_code == 403
 
         # Case 7: Malformed Origin
-        for bad_orig in ("null", "javascript:alert(1)", "://bad-url", "ftp://noryvanta.in"):
+        for bad_orig in ("null", "javascript:alert(1)", "://bad-url", "ftp://noryvantaglobal.com"):
             res_bad = await ac.post(
                 "/api/v1/auth/refresh",
                 json={},

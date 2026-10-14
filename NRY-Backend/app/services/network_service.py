@@ -1,4 +1,4 @@
-from datetime import datetime, timezone
+﻿from datetime import datetime, timezone
 from typing import List, Dict, Any, Optional
 from sqlalchemy.ext.asyncio import AsyncSession
 from sqlalchemy import select, and_, func
@@ -848,7 +848,7 @@ class NetworkProgressService:
         return ReferralInfoOut(
             uaid=uaid,
             referral_code=uaid,
-            share_url=f"https://noryvanta.in/register?ref={uaid}",
+            share_url=f"https://noryvantaglobal.com/register?ref={uaid}",
             qr_payload=f"NRY_REFERRAL:{uaid}",
             total_referrals=max(ref_count, 12),  # Demo sample if empty
             active_referrals=max(ref_count, 10),

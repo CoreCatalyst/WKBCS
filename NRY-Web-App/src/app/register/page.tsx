@@ -1,4 +1,4 @@
-"use client";
+﻿"use client";
 
 import React, { useState } from "react";
 import { useRouter } from "next/navigation";
@@ -453,7 +453,7 @@ export default function BusinessRegistrationPage() {
             {/* 1-Click WhatsApp Share */}
             <a
               href={`https://api.whatsapp.com/send?text=${encodeURIComponent(
-                `Join Noryvanta Sovereign B2B Marketplace with my verified Referral NRY ID: ${registeredUaid}. Register here: https://noryvanta.in/register?ref=${registeredUaid}`
+                `Join Noryvanta Sovereign B2B Marketplace with my verified Referral NRY ID: ${registeredUaid}. Register here: https://noryvantaglobal.com/register?ref=${registeredUaid}`
               )}`}
               target="_blank"
               rel="noopener noreferrer"

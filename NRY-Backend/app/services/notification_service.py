@@ -1,4 +1,4 @@
-import logging
+﻿import logging
 import httpx
 from abc import ABC, abstractmethod
 from typing import Dict, Any, Optional
@@ -133,7 +133,7 @@ class NotificationService:
                 </p>
             </div>
             <div style="border-top: 1px solid #e2e8f0; padding-top: 16px; font-size: 12px; color: #94a3b8; text-align: center;">
-                © 2026 Noryvanta.in — Sovereign Commerce Network. All rights reserved.
+                © 2026 noryvantaglobal.com — Sovereign Commerce Network. All rights reserved.
             </div>
         </div>
         """
@@ -156,7 +156,7 @@ class NotificationService:
                 </p>
             </div>
             <div style="border-top: 1px solid #e2e8f0; padding-top: 16px; font-size: 12px; color: #94a3b8; text-align: center;">
-                © 2026 Noryvanta.in
+                © 2026 noryvantaglobal.com
             </div>
         </div>
         """
@@ -179,7 +179,7 @@ class NotificationService:
                 </p>
             </div>
             <div style="border-top: 1px solid #e2e8f0; padding-top: 16px; font-size: 12px; color: #94a3b8; text-align: center;">
-                © 2026 Noryvanta.in
+                © 2026 noryvantaglobal.com
             </div>
         </div>
         """
@@ -209,7 +209,7 @@ class NotificationService:
                 </p>
             </div>
             <div style="border-top: 1px solid #e2e8f0; padding-top: 16px; font-size: 12px; color: #94a3b8; text-align: center;">
-                © 2026 Noryvanta.in
+                © 2026 noryvantaglobal.com
             </div>
         </div>
         """

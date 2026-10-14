@@ -1,4 +1,4 @@
-"use client";
+﻿"use client";
 
 import React, { useState } from "react";
 import { ShieldCheck, AlertTriangle, HelpCircle, X, CheckCircle2, FileText, Scale } from "lucide-react";
@@ -222,7 +222,7 @@ export const ContactEnquiryModal: React.FC<{
             </div>
 
             <p className="text-[11px] text-slate-400">
-              For buyer escrow protection and formal tax invoicing, all orders should be completed through Noryvanta.in.
+              For buyer escrow protection and formal tax invoicing, all orders should be completed through noryvantaglobal.com.
             </p>
           </div>
         ) : submitted ? (

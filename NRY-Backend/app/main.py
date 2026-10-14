@@ -1,4 +1,4 @@
-from contextlib import asynccontextmanager
+﻿from contextlib import asynccontextmanager
 from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
 from app.core.config import settings
@@ -14,12 +14,12 @@ async def seed_initial_demo_data():
     """Seeds initial demo vendors and wholesale products if the database is newly initialized."""
     async with AsyncSessionLocal() as session:
         # 0. Seed platform administrator if not exists
-        stmt_admin = select(User).where(or_(User.email == "admin@noryvanta.in", User.phone == "+919800099999"))
+        stmt_admin = select(User).where(or_(User.email == "admin@noryvantaglobal.com", User.phone == "+919800099999"))
         res_admin = await session.execute(stmt_admin)
         admin_user = res_admin.scalars().first()
         if not admin_user:
             admin_user = User(
-                email="admin@noryvanta.in",
+                email="admin@noryvantaglobal.com",
                 phone="+919800099999",
                 full_name="Platform Super Admin",
                 role=RoleEnum.ADMIN,
@@ -35,7 +35,7 @@ async def seed_initial_demo_data():
                 admin_user.hashed_password = get_password_hash("AdminSecure2026!")
             await session.commit()
 
-        stmt = select(User).where(User.email == "vendor@noryvanta.in")
+        stmt = select(User).where(User.email == "vendor@noryvantaglobal.com")
         res = await session.execute(stmt)
         existing_vendor = res.scalars().first()
         if existing_vendor and not existing_vendor.hashed_password:
@@ -45,7 +45,7 @@ async def seed_initial_demo_data():
         if not existing_vendor:
             # 1. Create default verified Wholesaler vendor user
             vendor_user = User(
-                email="vendor@noryvanta.in",
+                email="vendor@noryvantaglobal.com",
                 phone="+919876543210",
                 full_name="Rajesh Sharma (Managing Director)",
                 role=RoleEnum.VENDOR,
@@ -82,7 +82,7 @@ async def seed_initial_demo_data():
 
             # 2. Create Distributor Business Profile
             dist_user = User(
-                email="distributor@noryvanta.in",
+                email="distributor@noryvantaglobal.com",
                 phone="+919876543222",
                 full_name="Sunil Agarwal (Director of Distribution)",
                 role=RoleEnum.VENDOR,
@@ -115,7 +115,7 @@ async def seed_initial_demo_data():
 
             # 3. Create Retailer Business Profile
             retail_user = User(
-                email="retailer@noryvanta.in",
+                email="retailer@noryvantaglobal.com",
                 phone="+919876543233",
                 full_name="Pooja Patel (Proprietor)",
                 role=RoleEnum.VENDOR,
@@ -148,7 +148,7 @@ async def seed_initial_demo_data():
 
             # 4. Create Registered Service Provider Profile
             service_user = User(
-                email="corp.service@noryvanta.in",
+                email="corp.service@noryvantaglobal.com",
                 phone="+919876543244",
                 full_name="Dr. Arvind Varma (Head of Field Engineering)",
                 role=RoleEnum.VENDOR,
@@ -181,7 +181,7 @@ async def seed_initial_demo_data():
 
             # 5. Create Skilled Small-Scale Home Service Provider Profile
             home_service_user = User(
-                email="home.service@noryvanta.in",
+                email="home.service@noryvantaglobal.com",
                 phone="+919876543255",
                 full_name="Kaveri Electrical Works & Automation",
                 role=RoleEnum.VENDOR,

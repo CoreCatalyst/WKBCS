@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+﻿import React, { useState } from 'react';
 import { ArrowLeft, Copy, Check, Share2, QrCode, Users, ShieldCheck } from 'lucide-react';
 import { useApp } from '../context/AppContext';
 
@@ -7,7 +7,7 @@ export const ReferralShareScreen: React.FC = () => {
   const [copied, setCopied] = useState(false);
 
   const uaid = user?.uaid || 'NRY-C-7K4M9X2P8Q';
-  const shareUrl = `https://noryvanta.in/c/join?ref=${uaid}`;
+  const shareUrl = `https://noryvantaglobal.com/c/join?ref=${uaid}`;
   const shareMessage = `Join Noryvanta Customer Marketplace using my Customer UAID: ${uaid} and unlock commercial purchase rewards! Register here: ${shareUrl}`;
 
   const copyCode = () => {

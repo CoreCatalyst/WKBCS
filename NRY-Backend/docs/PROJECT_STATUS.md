@@ -1,4 +1,4 @@
-# NORYVANTA.IN — COMPREHENSIVE PROJECT STATUS AUDIT REPORT
+﻿# NORYVANTAGLOBAL.COM — COMPREHENSIVE PROJECT STATUS AUDIT REPORT
 > **Audit Date:** 2026-10-02  
 > **Session Status:** Resumed and Verified across New Antigravity Session  
 > **Repository:** `f:/PROJECT/Project/Noryvanta_Web`  
@@ -246,7 +246,7 @@ Noryvanta_Web/
 - **Local Engine**: SQLite via `aiosqlite` (`backend/noryvanta.db`)
 - **Production Target**: PostgreSQL / Supabase PostgreSQL via `asyncpg`
 - **Migration Engine**: Alembic with Versions 001, 002, 003, 004
-- **Seed Data**: MD vendor (`vendor@noryvanta.in`), 4 wholesale products with tiered MOQ pricing, and enterprise buyer (`buyer@enterprise.com`)
+- **Seed Data**: MD vendor (`vendor@noryvantaglobal.com`), 4 wholesale products with tiered MOQ pricing, and enterprise buyer (`buyer@enterprise.com`)
 
 ---
 

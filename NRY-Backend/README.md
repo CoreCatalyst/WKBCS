@@ -1,4 +1,4 @@
-# NORYVANTA — SHARED BACKEND REST API SERVER (`backend/`)
+﻿# NORYVANTA — SHARED BACKEND REST API SERVER (`backend/`)
 
 The `backend/` folder contains the unified, centralized REST API engine for the Noryvanta platform, powering both:
 1. **Noryvanta Business Web Application** (`frontend/`)
@@ -137,7 +137,7 @@ backend/
 ## 4. Mobile Customer Application API Contract
 
 Future Flutter or native Android/iOS mobile applications should:
-1. Configure `API_BASE_URL` dynamically from build environment configuration (e.g., `https://api.noryvanta.in/api/v1`).
+1. Configure `API_BASE_URL` dynamically from build environment configuration (e.g., `https://api.noryvantaglobal.com/api/v1`).
 2. Obtain session tokens via `POST /api/v1/auth/otp/verify` or `POST /api/v1/auth/google`.
 3. Securely store JWT tokens in platform-appropriate keystores (Android EncryptedSharedPreferences / iOS Keychain).
 4. Send `Authorization: Bearer <access_token>` in HTTP headers for protected requests.

@@ -1,4 +1,4 @@
-# Noryvanta.in — Sovereign Commerce Marketplace & Operating System
+﻿# noryvantaglobal.com — Sovereign Commerce Marketplace & Operating System
 
 <div align="center">
 
@@ -23,7 +23,7 @@
 
 ## 📌 Executive Summary
 
-**Noryvanta** (`Noryvanta.in`) is an enterprise-grade digital marketplace and business operating system engineered for India's B2B and B2C commerce ecosystem. It seamlessly unites manufacturers, bulk wholesalers, regional distributors, retail store operators, corporate service enterprises, and verified home service professionals on a single sovereign platform.
+**Noryvanta** (`noryvantaglobal.com`) is an enterprise-grade digital marketplace and business operating system engineered for India's B2B and B2C commerce ecosystem. It seamlessly unites manufacturers, bulk wholesalers, regional distributors, retail store operators, corporate service enterprises, and verified home service professionals on a single sovereign platform.
 
 ### Core Value Propositions & Business Invariants
 1. **Zero Buyer Platform Fee Guarantee**: Consumers and purchasing businesses pay strictly `Subtotal + GST`. Platform fees and statutory deductions are assessed exclusively vendor-side within automated financial settlement ledgers.

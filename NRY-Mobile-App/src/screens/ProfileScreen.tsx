@@ -8,8 +8,8 @@ export const ProfileScreen: React.FC = () => {
 
   const uaid = user?.uaid || 'NRY-C-7K4M9X2P8Q';
   const name = user?.full_name || 'Aditi Deshmukh';
-  const email = user?.email || 'aditi.customer@noryvanta.in';
-  const phone = user?.phone || '+91 98765 43210';
+  const email = user?.email || 'aditi.customer@noryvantaglobal.com';
+  const phone = user?.phone || '+91 7507897697';
 
   const copyUaid = () => {
     navigator.clipboard?.writeText(uaid);

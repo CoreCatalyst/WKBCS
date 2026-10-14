@@ -1,4 +1,4 @@
-"use client";
+﻿"use client";
 
 import React, { useState, useMemo } from "react";
 import {
@@ -285,13 +285,13 @@ export const NetworkProgressTracker: React.FC = () => {
 
   // Share referral handler
   const handleShareReferral = async () => {
-    const text = `Join Noryvanta using my referral ID: ${currentMember.uaid} and unlock commercial marketplace growth! https://noryvanta.in/register?ref=${currentMember.uaid}`;
+    const text = `Join Noryvanta using my referral ID: ${currentMember.uaid} and unlock commercial marketplace growth! https://noryvantaglobal.com/register?ref=${currentMember.uaid}`;
     if (navigator.share) {
       try {
         await navigator.share({
           title: "Noryvanta Referral",
           text,
-          url: `https://noryvanta.in/register?ref=${currentMember.uaid}`
+          url: `https://noryvantaglobal.com/register?ref=${currentMember.uaid}`
         });
       } catch {
         // Fallback to clipboard

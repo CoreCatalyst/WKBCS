@@ -1,4 +1,4 @@
-import pytest
+﻿import pytest
 from httpx import AsyncClient, ASGITransport
 from app.main import app
 from app.core.config import settings
@@ -195,7 +195,7 @@ async def test_media_upload_authorization_and_validation():
             "category": "Industrial Machinery & Automation",
             "hsn_code": "848180",
             "base_price": 3200.0,
-            "images": ["https://cdn.noryvanta.in/draft/1.jpg"],
+            "images": ["https://cdn.noryvantaglobal.com/draft/1.jpg"],
             "is_draft": True
         })
         assert prod_create.status_code == 200
@@ -205,7 +205,7 @@ async def test_media_upload_authorization_and_validation():
         for i in range(2, 5):
             confirm_res = await ac.post(f"/api/v1/products/{prod_id}/media/confirm-upload", headers=headers, json={
                 "storage_key": f"businesses/test/listings/{prod_id}/img_{i}.jpg",
-                "public_url": f"https://cdn.noryvanta.in/listings/{prod_id}/img_{i}.jpg",
+                "public_url": f"https://cdn.noryvantaglobal.com/listings/{prod_id}/img_{i}.jpg",
                 "media_type": "image",
                 "mime_type": "image/jpeg",
                 "file_size_bytes": 204800
@@ -224,7 +224,7 @@ async def test_media_upload_authorization_and_validation():
 
         # 7. Delete an image dropping count below 4 -> automatically demotes from ACTIVE to DRAFT
         del_res = await ac.request("DELETE", f"/api/v1/products/{prod_id}/media", headers=headers, json={
-            "url": f"https://cdn.noryvanta.in/listings/{prod_id}/img_4.jpg",
+            "url": f"https://cdn.noryvantaglobal.com/listings/{prod_id}/img_4.jpg",
             "storage_key": f"businesses/test/listings/{prod_id}/img_4.jpg"
         })
         assert del_res.status_code == 200
