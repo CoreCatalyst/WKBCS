@@ -38,8 +38,9 @@
    - When a transaction reaches Level 120, it completes Cycle 1 and unlocks the Legendary rank reward.
    - Only the remaining unconsumed transaction volume crosses into Cycle 2 as the opening qualifying balance (starting at Level 0).
    - Zero double-counting: $\sum \text{Allocations} \le \text{Eligible Transaction Amount}$.
-5. **Strict Listing Verification & 6-Image Rule**: Products require a minimum of 6 verified high-resolution images (`HTTP 422` enforced). Listings follow an audited lifecycle: `DRAFT` → `SUBMITTED` → `UNDER_REVIEW` → `ACTIVE`.
-6. **Merchant Privacy Guarantee**: Public marketplace APIs isolate vendor identities (`trade_name`, `city`, `rating`, `is_verified`), never exposing sensitive banking credentials, PAN, or virtual escrow IDs to consumers.
+5. **Approved Listing Media Rules**: Minimum 4 product/service images mandatory, maximum 10 images permitted (`HTTP 422` enforced server-side). Up to 2 permitted short video clips (max 20 MB, max 30s).
+6. **Approved Category Fee Schedule**: Wholesaler: 3.20%, Distributor: 5.20%, Retailer: 8.20%, Services: 5.20%.
+7. **Merchant Privacy Guarantee**: Public marketplace APIs isolate vendor identities (`trade_name`, `city`, `rating`, `is_verified`), never exposing sensitive banking credentials, PAN, or virtual escrow IDs to consumers.
 7. **Double-Entry Financial Ledger**: Append-only ledgers record gross sales, platform fees, Section 194-O TDS (1%), GST, and net vendor settlements with T+1 bank payouts.
 
 ---
@@ -68,63 +69,64 @@ graph TD
 ## 📂 Project Structure
 
 ```
-Noryvanta_Web/
-├── .env.example                      # Root environment variable template
-├── .gitignore                        # Secret & database protection (.env, db files)
-├── ARCHITECTURE_DECISIONS.md         # Documented architectural records & invariant rationales
-├── CHANGELOG.md                      # Chronological change log
-├── DEPLOYMENT.md                     # Production deployment procedures (Docker / Cloud / Supabase)
-├── SECURITY.md                       # Security practices, threat model & compliance protocols
-├── SETUP.md                          # Local developer quick-start guide
-├── docker-compose.yml                # Multi-container stack (postgres, redis, backend, celery, nginx, prometheus, grafana)
-├── docs/                             # Exhaustive architectural blueprints & specifications
-│   ├── API.md
-│   ├── Architecture.md
-│   ├── Backend.md
-│   ├── Design.md
-│   ├── Frontend.md
-│   ├── Govt_Rules.md
-│   ├── Policies.md
-│   └── Terms & Condition.md
-├── infra/                            # Infrastructure configuration files
-│   ├── grafana/                      # Dashboards & datasource definitions
-│   ├── nginx/                        # Nginx reverse proxy configuration
-│   └── prometheus/                   # Prometheus scraping configuration
-├── backend/                          # FastAPI Backend Engine (Python 3.14 / SQLAlchemy 2.0 Async)
-│   ├── alembic/                      # Multi-stage database migration sequence
-│   │   ├── env.py
-│   │   └── versions/
-│   │       ├── 001_businesses_table.py
-│   │       ├── 002_add_gst_number.py
-│   │       ├── 003_add_verification_status.py
-│   │       ├── 004_add_business_category.py
-│   │       ├── 005_add_network_referral_reward_system.py
-│   │       ├── 006_add_uaid_and_quarterly_rules.py
-│   │       ├── 007_versioned_platform_fee_rules.py
-│   │       ├── 008_fee_transaction_base_and_financial_breakdown.py
-│   │       ├── 009_level_progression_ledger.py
-│   │       └── 010_cycle_transition_and_allocations.py
+Noryvanta/
+│
+├── frontend/                         # Noryvanta Business Web Application (Next.js 15 / React 19)
+│   ├── src/
+│   │   ├── app/                      # 18+ App Router pages (admin, checkout, dashboard, products, vendor, rank-tracker)
+│   │   ├── components/               # Modular UI components (Navbar, Footer, Modals)
+│   │   ├── layouts/                  # MainLayout and DashboardLayout
+│   │   ├── hooks/                    # useAuth, useBusiness, useProducts
+│   │   ├── services/                 # Centralized Backend API Client Services
+│   │   │   ├── apiClient.ts          # Central Axios HTTP client with JWT interceptors
+│   │   │   ├── authApi.ts            # Authentication, OTP, Google login
+│   │   │   ├── businessApi.ts        # Business registration, dashboard, settlements
+│   │   │   ├── productApi.ts         # Product catalog, media validation, AI assist
+│   │   │   ├── serviceApi.ts         # Services marketplace, bookings
+│   │   │   ├── orderApi.ts           # Orders, invoices, financial breakdown
+│   │   │   ├── paymentApi.ts         # Razorpay & Cashfree payment sessions
+│   │   │   ├── uaidApi.ts            # UAID retrieval and resolution
+│   │   │   └── rewardApi.ts          # Referral ledger, reward wallet
+│   │   ├── types/                    # Shared TypeScript interfaces
+│   │   ├── utils/                    # Currency formatters, media validators, fee schedules
+│   │   └── styles/                   # Design system tokens & Tailwind CSS
+│   ├── public/                       # Static public assets
+│   ├── tests/                        # Frontend contract & utility tests
+│   ├── package.json                  # Dependencies
+│   ├── tsconfig.json                 # TypeScript compiler configuration
+│   ├── .env.example                  # Non-secret public configuration template
+│   └── README.md                     # Frontend architecture documentation
+│
+├── backend/                          # Shared Backend REST API Server (FastAPI / SQLAlchemy 2.0 Async)
 │   ├── app/
-│   │   ├── api/
+│   │   ├── main.py                   # FastAPI server entrypoint & Prometheus /metrics
+│   │   ├── api/                      # Versioned REST APIs (/api/v1)
 │   │   │   ├── deps.py               # Dependency injection (get_current_user, get_current_admin)
-│   │   │   └── v1/
-│   │   │       ├── api.py            # Aggregates 17 modular route handlers
-│   │   │       └── endpoints/        # admin, auth, businesses, escrow, fees, kyc, marketplace, network, orders, payments, products, referrals, rewards, settlements
-│   │   ├── core/                     # Database, security & Pydantic v2 settings
-│   │   ├── models/                   # SQLAlchemy declarative models (business, network, order, escrow, kyc, audit)
+│   │   │   └── v1/                   # auth, businesses, products, services, customers, orders, payments, uaid, referrals, rewards, admin
+│   │   ├── core/                     # config.py, database.py, security.py, permissions.py
+│   │   ├── models/                   # Declarative SQLAlchemy ORM models
 │   │   ├── schemas/                  # Pydantic v2 validation schemas
-│   │   └── services/                 # Business logic, fee calculation, network progression & adapters
-│   ├── tests/                        # 18 test suites (111 passed tests)
-│   └── requirements.txt              # Backend dependencies
-└── frontend/                         # Next.js 15.5 (React 19) Frontend App
-    ├── public/                       # High-res logos, icons, static assets
-    ├── src/
-    │   ├── app/                      # 18 App Router pages (admin, checkout, dashboard, products, vendor, rank-tracker)
-    │   ├── components/               # UI components, layout (Navbar, Footer, MobileNav), trust badges
-    │   ├── contexts/                 # React contexts (Country, Language, Marketplace, PaymentGateway)
-    │   ├── lib/                      # API client, fee configuration, network progress utilities
-    │   └── styles/                   # Modern styling & Tailwind CSS
-    └── package.json                  # Frontend dependencies
+│   │   ├── services/                 # Domain services (escrow, fees, network, payment, AI)
+│   │   ├── repositories/             # Repository pattern abstractions
+│   │   ├── db/                       # Centralized database session & base model registry
+│   │   ├── middleware/               # CORS and security middleware
+│   │   ├── integrations/             # payments, notifications, storage, identity
+│   │   ├── tasks/                    # Celery asynchronous task definitions
+│   │   └── utils/                    # Formatting and normalization helpers
+│   ├── alembic/                      # Database migrations (001 to 010)
+│   ├── tests/                        # Pytest asynchronous test suite (111 passing tests)
+│   ├── docs/                         # Exhaustive architectural blueprints & specifications
+│   ├── scripts/                      # Database utilities and seed scripts
+│   ├── requirements.txt              # Backend dependencies
+│   ├── alembic.ini                   # Alembic configuration
+│   ├── .env                          # Local private configuration
+│   ├── .env.example                  # Validated environment configuration template
+│   └── README.md                     # Backend API & Mobile contract documentation
+│
+├── infra/                            # Multi-container infrastructure configurations (Nginx, Prometheus, Grafana, Postgres)
+├── docker-compose.yml                # Multi-container orchestration stack
+├── .gitignore                        # Strict secret & local artifact exclusions
+└── README.md                         # Project overview & architectural guide
 ```
 
 ---
@@ -333,3 +335,5 @@ The public marketplace API is decoupled, stateless, and consumable by Web, Mobil
 
 Copyright © 2026 **Noryvanta Technologies Private Limited**. All Rights Reserved.  
 Proprietary commercial software. Unauthorized reproduction, distribution, or decompilation is strictly prohibited.
+#   W K B C S  
+ 
